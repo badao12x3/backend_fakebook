@@ -1,7 +1,9 @@
+
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 import 'package:fakebook_frontend/models/Models.dart';
+import '../../Screens.dart';
 
 class CreatePostContainer extends StatelessWidget {
   final User currentUser;
@@ -26,6 +28,9 @@ class CreatePostContainer extends StatelessWidget {
               Expanded(
                 child: TextField(
                   decoration: InputDecoration.collapsed(hintText: 'Bạn đang nghĩ gì?'),
+                  onTap: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => CreatePostScreen()) );
+                  },
                 ),
               ),
               TextButton.icon(

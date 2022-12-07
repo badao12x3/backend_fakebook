@@ -16,4 +16,9 @@ class Palette {
     end: Alignment.bottomCenter,
     colors: [Colors.transparent, Colors.black26],
   );
+
+  static const grey1 = Color(0xFF383838);
+  static const grey2 = Color(0xFF8A8A8A);
+  static const grey3 = Color(0xFFEEEFF2);
+
 }
