@@ -1,4 +1,5 @@
 import 'package:fakebook_frontend/constants/Palette.dart';
+import 'package:fakebook_frontend/screens/friend/FriendScreen.dart';
 import 'package:fakebook_frontend/screens/home/HomeScreen.dart';
 import 'package:flutter/material.dart';
 
@@ -21,9 +22,7 @@ class _NavScreenState extends State<NavScreen> with TickerProviderStateMixin{
     // ProfileScreen(),
     // NotificationScreen(),
     // MenuScreen(),
-    Center(
-      child: Text("It's cloudy here"),
-    ),
+    FriendScreen(),
     Center(
       child: Text("It's rainy here"),
     ),
