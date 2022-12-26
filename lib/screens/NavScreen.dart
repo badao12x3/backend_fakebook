@@ -1,5 +1,6 @@
 import 'package:fakebook_frontend/constants/Palette.dart';
 import 'package:fakebook_frontend/screens/home/HomeScreen.dart';
+import 'package:fakebook_frontend/screens/watch/watchScreen.dart';
 import 'package:flutter/material.dart';
 
 class NavScreen extends StatefulWidget {
@@ -24,9 +25,10 @@ class _NavScreenState extends State<NavScreen> with TickerProviderStateMixin{
     Center(
       child: Text("It's cloudy here"),
     ),
-    Center(
-      child: Text("It's rainy here"),
-    ),
+    // Center(
+    //   child: Text("It's rainy here"),
+    // ),
+    WatchTab(),
     Center(
       child: Text("It's sunny here"),
     ),
