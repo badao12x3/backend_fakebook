@@ -1,5 +1,6 @@
 import 'package:fakebook_frontend/screens/menu/sub_screens/PassSecScreen.dart';
 import 'package:fakebook_frontend/screens/menu/sub_screens/PerAccInfoScreen.dart';
+import 'package:fakebook_frontend/screens/menu/sub_screens/notificationsettings/NotificationSettingsScreen.dart';
 import 'package:flutter/material.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -94,7 +95,9 @@ class SettingsScreen extends StatelessWidget {
                         settingsDes: 'Customize your experience on Facebook'),
                     const SizedBox(height: 5.0),
                     _SettingsButton(
-                        onPressed: () => print('Notifications'),
+                        onPressed: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (context)=>NotificationSettingsScreen()));
+                        },
                         icon: Icons.notifications_none,
                         buttonName: 'Notifications')
                   ],
