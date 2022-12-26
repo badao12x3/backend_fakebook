@@ -1,3 +1,4 @@
+import 'package:fakebook_frontend/screens/NavScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -63,7 +64,12 @@ class LoginScreen extends StatelessWidget {
                                 height: 40, //height of button
                                 width: double.infinity, //width of button
                                 child: ElevatedButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => NavScreen()));
+                                  },
                                   child: Text('Login'),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Palette.facebookBlue,
