@@ -10,11 +10,15 @@ class NavScreen extends StatefulWidget {
   State<NavScreen> createState() => _NavScreenState();
 }
 
-
-class _NavScreenState extends State<NavScreen> with TickerProviderStateMixin{
+class _NavScreenState extends State<NavScreen> with TickerProviderStateMixin {
   late TabController _tabController;
   static final List<IconData> _icons = const [
-    Icons.home, Icons.people, Icons.ondemand_video, Icons.account_circle, Icons.notifications, Icons.menu
+    Icons.home,
+    Icons.people,
+    Icons.ondemand_video,
+    Icons.account_circle,
+    Icons.notifications,
+    Icons.menu
   ];
   static final List<Widget> _screens = [
     HomeScreen(),
@@ -37,9 +41,8 @@ class _NavScreenState extends State<NavScreen> with TickerProviderStateMixin{
     MenuScreen(),
   ];
 
-  final List<Tab> _screenTabs = _icons.map((icon) => Tab(
-    icon: Icon(icon,size: 30)
-  )).toList();
+  final List<Tab> _screenTabs =
+      _icons.map((icon) => Tab(icon: Icon(icon, size: 30))).toList();
 
   @override
   void initState() {
@@ -47,6 +50,7 @@ class _NavScreenState extends State<NavScreen> with TickerProviderStateMixin{
     // _tabController = TabController(vsync: this, length: 6, animationDuration: Duration.zero); // error due to animationDuration on Flutter 3.3.2
     _tabController = TabController(vsync: this, length: _screens.length);
   }
+
   @override
   void dispose() {
     print("dispose");
@@ -58,21 +62,15 @@ class _NavScreenState extends State<NavScreen> with TickerProviderStateMixin{
   Widget build(BuildContext context) {
     return Scaffold(
       body: TabBarView(
-        controller: _tabController,
-        children: _screens,
-        physics: NeverScrollableScrollPhysics()
-      ),
+          controller: _tabController,
+          children: _screens,
+          physics: NeverScrollableScrollPhysics()),
       bottomNavigationBar: TabBar(
         controller: _tabController,
         tabs: _screenTabs,
         indicator: BoxDecoration(
-          border: Border(
-            top: BorderSide(
-              color: Palette.facebookBlue,
-              width: 3
-            )
-          )
-        ),
+            border:
+                Border(top: BorderSide(color: Palette.facebookBlue, width: 3))),
         indicatorColor: Colors.blueAccent,
         unselectedLabelColor: Colors.black45,
         labelColor: Colors.blueAccent,
