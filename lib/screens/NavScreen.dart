@@ -1,5 +1,7 @@
 import 'package:fakebook_frontend/constants/Palette.dart';
+import 'package:fakebook_frontend/screens/friend/FriendScreen.dart';
 import 'package:fakebook_frontend/screens/home/HomeScreen.dart';
+import 'package:fakebook_frontend/screens/menu/MenuScreen.dart';
 import 'package:flutter/material.dart';
 
 class NavScreen extends StatefulWidget {
@@ -20,10 +22,7 @@ class _NavScreenState extends State<NavScreen> with TickerProviderStateMixin{
     // FriendScreen(),
     // ProfileScreen(),
     // NotificationScreen(),
-    // MenuScreen(),
-    Center(
-      child: Text("It's cloudy here"),
-    ),
+    FriendScreen(),
     Center(
       child: Text("It's rainy here"),
     ),
@@ -33,9 +32,11 @@ class _NavScreenState extends State<NavScreen> with TickerProviderStateMixin{
     Center(
       child: Text("It's not rainy here"),
     ),
-    Center(
-      child: Text("It's not sunny here"),
-    ),
+    // Center(
+    //   child: Text("It's not sunny here"),
+    // ),
+    MenuScreen(),
+
   ];
 
   final List<Tab> _screenTabs = _icons.map((icon) => Tab(
