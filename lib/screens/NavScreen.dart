@@ -2,6 +2,7 @@ import 'package:fakebook_frontend/constants/Palette.dart';
 import 'package:fakebook_frontend/screens/friend/FriendScreen.dart';
 import 'package:fakebook_frontend/screens/home/HomeScreen.dart';
 import 'package:fakebook_frontend/screens/menu/MenuScreen.dart';
+import 'package:fakebook_frontend/screens/watch/watchScreen.dart';
 import 'package:flutter/material.dart';
 
 class NavScreen extends StatefulWidget {
@@ -19,22 +20,14 @@ class _NavScreenState extends State<NavScreen> with TickerProviderStateMixin{
   ];
   static final List<Widget> _screens = [
     HomeScreen(),
-    // FriendScreen(),
-    // ProfileScreen(),
-    // NotificationScreen(),
     FriendScreen(),
-    Center(
-      child: Text("It's rainy here"),
-    ),
+    WatchTab(),
     Center(
       child: Text("It's sunny here"),
     ),
     Center(
       child: Text("It's not rainy here"),
     ),
-    // Center(
-    //   child: Text("It's not sunny here"),
-    // ),
     MenuScreen(),
 
   ];

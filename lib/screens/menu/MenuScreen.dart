@@ -14,6 +14,7 @@ class MenuScreen extends StatelessWidget {
       slivers: [
         SliverAppBar(
           backgroundColor: Colors.grey[100],
+          automaticallyImplyLeading: false,
           title: const Text(
             'Menu',
             style: TextStyle(

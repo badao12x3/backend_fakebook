@@ -19,6 +19,7 @@ class HomeScreen extends StatelessWidget {
               statusBarColor: Colors.lightBlue, // Status bar
             ),
             backgroundColor: Colors.white,
+            automaticallyImplyLeading: false,
             title: Text(
               'facebook',
               style: const TextStyle(color: Palette.facebookBlue, fontSize: 28, fontWeight: FontWeight.bold, letterSpacing: -1),
