@@ -1,8 +1,17 @@
-import 'package:fakebook_frontend/constants/Palette.dart';
-import 'package:flutter/material.dart';
-import './screens/Screens.dart';
+import 'dart:io';
 
-void main() {
+import 'package:bloc/bloc.dart';
+import 'package:fakebook_frontend/configuration.dart';
+import 'package:fakebook_frontend/simple_bloc_observer.dart';
+import 'package:flutter/material.dart';
+
+import 'package:fakebook_frontend/constants/assets/palette.dart';
+import './screens/screens.dart';
+
+
+void main() async{
+  // debug global BLOC, suggesting turn off, please override in debug local BLOC
+  Bloc.observer = SimpleBlocObserver();
   runApp(const MyApp());
 }
 
