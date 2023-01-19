@@ -1,9 +1,10 @@
 import 'package:equatable/equatable.dart';
+import 'package:fakebook_frontend/models/models.dart';
 
 class PostList {
   final List<Post> posts;
-  final String new_items;
-  final String last_id;
+  String new_items; // bỏ final
+  String last_id; // bỏ final
 
   PostList({required this.posts, required this.new_items, required this.last_id});
 
@@ -29,6 +30,7 @@ class PostList {
 
   @override
   String toString() => toJson().toString();
+
 }
 
 class Post extends Equatable {
@@ -37,7 +39,7 @@ class Post extends Equatable {
   final String createdAt;
   final String updatedAt;
   final List<AttachedImage>? images;
-  final List<AttachedVideo>? video;
+  final AttachedVideo? video;
   // final List<int>? likedAccounts;
   // final List<int>? commentList;
   final int likes;
@@ -53,11 +55,14 @@ class Post extends Equatable {
   Post({required this.id, required this.described, required this.createdAt, required this.updatedAt, this.images, this.video, required this.likes, required this.comments, required this.author, required this.isLiked, required this.isBlocked, this.status, required this.canComment, required this.canEdit, required this.banned});
 
   factory Post.fromJson(Map<String, dynamic> json) {
+    final imagesData = json["images"] as List<dynamic>?;
+    final images = imagesData != null ? imagesData.map((imageData) => AttachedImage.fromJson(imageData)).toList() : null;
     return Post(
       id: json["id"] as String,
       described: json["described"] as String,
       createdAt: json["createdAt"] as String,
       updatedAt: json["updatedAt"] as String,
+      images: images,
       likes: json["likes"] as int,
       comments: json["comments"] as int,
       author: Author.fromJson(json["author"]) as Author,
@@ -99,22 +104,24 @@ class Post extends Equatable {
 
 }
 
-class Media extends Equatable {
-  // final String? filename;
+
+class AttachedImage extends Equatable {
+  final String? filename;
   final String url;
   final String? publicId;
 
-  Media({required this.url, this.publicId});
+  AttachedImage({this.filename, required this.url, this.publicId});
 
-  Media copyWith(String? url, String? publicId) {
-    return Media(
-      url: url ?? this.url,
-      publicId: publicId ?? this.publicId
+  AttachedImage copyWith(String? filename, String? url, String? publicId) {
+    return AttachedImage(
+        filename: filename ?? this.filename,
+        url: url ?? this.url,
+        publicId: publicId ?? this.publicId
     );
   }
 
-  factory Media.fromJson(Map<String, dynamic> json) {
-    return Media(url: json['url'] as String, publicId: json['publicId'] as String?);
+  factory AttachedImage.fromJson(Map<String, dynamic> json) {
+    return AttachedImage(filename: json['filename'] as String?, url: json['url'] as String, publicId: json['publicId'] as String?);
   }
 
   Map<String, dynamic> toJson() {
@@ -126,21 +133,46 @@ class Media extends Equatable {
 
   @override
   // TODO: implement props
-  List<Object?> get props => [url, publicId];
+  List<Object?> get props => [filename, url, publicId];
 
   @override
   String toString() => toJson().toString();
 }
 
-class AttachedImage extends Media {
-  AttachedImage({required url, publicId}): super(url: url, publicId: publicId);
+class AttachedVideo extends Equatable {
+  final String? filename;
+  final String url;
+  final String? publicId;
 
+  AttachedVideo({this.filename, required this.url, this.publicId});
+
+  AttachedVideo copyWith(String? filename, String? url, String? publicId) {
+    return AttachedVideo(
+        filename: filename ?? this.filename,
+        url: url ?? this.url,
+        publicId: publicId ?? this.publicId
+    );
+  }
+
+  factory AttachedVideo.fromJson(Map<String, dynamic> json) {
+    return AttachedVideo(filename: json['filename'] as String?, url: json['url'] as String, publicId: json['publicId'] as String?);
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'url': url,
+      if(publicId != null) 'publicId': publicId
+    };
+  }
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [filename, url, publicId];
+
+  @override
+  String toString() => toJson().toString();
 }
 
-class AttachedVideo extends Media {
-  AttachedVideo({required url, publicId}): super(url: url, publicId: publicId);
-
-}
 
 class Author extends Equatable {
     final String id;
