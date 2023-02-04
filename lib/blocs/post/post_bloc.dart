@@ -89,25 +89,25 @@ class PostBloc extends Bloc<PostEvent, PostState> {
   @override
   void onError(Object error, StackTrace stackTrace) {
     super.onError(error, stackTrace);
-    print('POST OBSERVER: $error');
+    print('#POST OBSERVER: $error');
   }
 
   @override
   void onTransition(Transition<PostEvent, PostState> transition) {
     super.onTransition(transition);
-    // print('POST OBSERVER: $transition');
+    // print('#POST OBSERVER: $transition');
   }
 
   @override
   void onEvent(PostEvent event) {
     super.onEvent(event);
-    print('POST OBSERVER: $event');
+    print('#POST OBSERVER: $event');
   }
 
   @override
   void onChange(Change<PostState> change) {
     super.onChange(change);
-    print('POST OBSERVER: { stateCurrent: ${change.currentState.postList.posts.length}, last_idCurrent: ${change.currentState.postList.last_id}, statusCurrent: ${change.currentState.status}, hasReachedMaxCurrent: ${change.currentState.hasReachedMax} }');
-    print('POST OBSERVER: { stateNext: ${change.nextState.postList.posts.length}, last_idNext: ${change.nextState.postList.last_id}, statusNext: ${change.nextState.status}, hasReachedMaxCurrentNext: ${change.nextState.hasReachedMax}}');
+    print('#POST OBSERVER: { stateCurrent: ${change.currentState.postList.posts.length}, last_idCurrent: ${change.currentState.postList.last_id}, statusCurrent: ${change.currentState.status}, hasReachedMaxCurrent: ${change.currentState.hasReachedMax} }');
+    print('#POST OBSERVER: { stateNext: ${change.nextState.postList.posts.length}, last_idNext: ${change.nextState.postList.last_id}, statusNext: ${change.nextState.status}, hasReachedMaxCurrentNext: ${change.nextState.hasReachedMax}}');
   }
 }

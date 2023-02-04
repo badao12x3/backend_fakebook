@@ -4,13 +4,13 @@ class SimpleBlocObserver extends BlocObserver {
   // @override
   // void onEvent(Bloc bloc, Object? event) {
   //   super.onEvent(bloc, event);
-  //   print('GLOBAL OBSERVER: ${bloc.runtimeType} $event');
+  //   print('#GLOBAL OBSERVER: ${bloc.runtimeType} $event');
   // }
   //
   // @override
   // void onChange(BlocBase bloc, Change change) {
   //   super.onChange(bloc, change);
-  //   print('GLOBAL OBSERVER: ${bloc.runtimeType} $change');
+  //   print('#GLOBAL OBSERVER: ${bloc.runtimeType} $change');
   // }
   //
   // @override
