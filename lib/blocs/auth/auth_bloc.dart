@@ -15,6 +15,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
     on<Login>(_onLogin);
     on<Logout>(_onLogout);
+    on<KeepSession>(_checkAndKeepLoginSession);
   }
 
   // void async = Future<void> async
@@ -51,6 +52,19 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     // print(successRemoveUserData);
     emit(state.copyWith(status: AuthStatus.unauthenticated, authUser: AuthUser.initial()));
   }
+
+  void _checkAndKeepLoginSession(KeepSession event, Emitter<AuthState> emit) async {
+    final prefs = await SharedPreferences.getInstance();
+    String? userPref = prefs.getString('user');
+    if (userPref != null) {
+      Map<String,dynamic> userMap = jsonDecode(userPref) as Map<String, dynamic>;
+      final _id = userMap['id'];
+      final _name = userMap['name'];
+      final _token = userMap['token'];
+      emit(AuthState(status: AuthStatus.authenticated, authUser: AuthUser(code: '200', message: 'OK restore login session', id: _id, name: _name, token: _token, avatar: '', active: false)));
+    }
+  }
+
 
   @override
   void onError(Object error, StackTrace stackTrace) {

@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:bloc/bloc.dart';
 import 'package:fakebook_frontend/Routes.dart';
 import 'package:fakebook_frontend/blocs/auth/auth_bloc.dart';
+import 'package:fakebook_frontend/blocs/auth/auth_event.dart';
 import 'package:fakebook_frontend/blocs/auth/auth_state.dart';
 import 'package:fakebook_frontend/configuration.dart';
 import 'package:fakebook_frontend/simple_bloc_observer.dart';
@@ -24,12 +25,6 @@ void main() async{
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // getUserFromLocalStorage() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   String userPref = prefs.getString('user') ?? '{"user": "No userdata"}';
-  //   Map<String,dynamic> userMap = jsonDecode(userPref) as Map<String, dynamic>;
-  // }
-
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -43,7 +38,7 @@ class MyApp extends StatelessWidget {
       ),
       home:  BlocProvider(
         lazy: false,
-        create: (_) => AuthBloc(),
+        create: (_) => AuthBloc()..add(KeepSession()),
         child: BlocBuilder<AuthBloc, AuthState>(
           builder: (context, state) {
             switch (state.status) {
