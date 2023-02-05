@@ -19,7 +19,7 @@ class AuthRepository {
     //     })
     // );
     // print(response2.body);
-    final url = Uri.http(Configuration.baseUrlPhysicalDevice2, 'account/login');
+    final url = Uri.http(Configuration.baseUrlConnect, 'account/login');
     final response = await http.post(url,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',

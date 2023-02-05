@@ -89,20 +89,22 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   final formStateKey = GlobalKey<FormState>();
-  void submitForm(BuildContext context) {
+  void submitForm(BuildContext context) async {
     if (formStateKey.currentState?.validate() ?? true) { // Khi form gọi hàm validate thì tất cả các TextFormField sẽ gọi hàm validate. Hàm validate trả về true là thành công, false là thất bại
       // print('#Validate: Trước khi save: Phone: ${phone} và Password: ${password}');
       formStateKey.currentState?.save(); // khi form gọi hàm save thì tất cả các TextFormField sẽ gọi hàm save
       // print('#Validate: Sau khi save: Phone: ${phone} và Password: ${password}');
       BlocProvider.of<AuthBloc>(context).add(Login(phone: phone!, password: password!));
-      // lấy thông tin người dùng
-      final userInfo = BlocProvider.of<AuthBloc>(context).state.authUser;
-      final _id = userInfo.id;
-      final _name = userInfo.name;
-      final _token = userInfo.token;
-      // lưu vào cache
-      // final prefs = await SharedPreferences.getInstance();
+
+      // để logic ở UI sẽ bị chậm không cập nhật. Chuyển logic vào trong auth_bloc
+      // lấy thông tin người dùng và lưu vào cache
+      // final userInfo = BlocProvider.of<AuthBloc>(context).state.authUser;
+      // final _id = userInfo.id;
+      // final _name = userInfo.name;
+      // final _token = userInfo.token;
       // Map<String, dynamic> user = {'id': _id, 'name': _name, 'token': _token};
+      // final prefs = await SharedPreferences.getInstance();
+      // print("#Login: "+user.toString()); // đang làm ở đây
       // await prefs.setString('user', jsonEncode(user));
 
       // Bởi vì cập nhật state bằng Bloc nên không cần push từ Login

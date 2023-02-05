@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:fakebook_frontend/Routes.dart';
 import 'package:fakebook_frontend/blocs/auth/auth_bloc.dart';
 import 'package:fakebook_frontend/blocs/auth/auth_event.dart';
@@ -14,13 +16,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 class MenuScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    void handleLogout() {
-      print("logout");
+    Future<void> handleLogout() async {
       // Bởi vì cập nhật trạng thái AuthState, nên không cần thiết pop. Nếu cố tình dùng pop sẽ mất context
       // Navigator.popAndPushNamed(context, Routes.login_screen);
       BlocProvider.of<AuthBloc>(context).add(Logout());
+      // dù câu lệnh ở đằng sau nhưng vì là bất đồng bộ nên vẫn là AuthStatus.authenticated
       final user = BlocProvider.of<AuthBloc>(context).state.status;
-      print("Logout getUser:" + user.toString());
+      // print("Logout getUser: " + user.toString());
     }
     return Scaffold(
         body: CustomScrollView(
@@ -59,18 +61,18 @@ class MenuScreen extends StatelessWidget {
                         const SizedBox(width: 12.0),
                         Expanded(
                             child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(currentUser.name,
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 18.0,
-                                    color: Colors.black)),
-                            const Text(
-                              'See your profile',
-                              style: TextStyle(color: Palette.facebookBlue),
-                            ),
-                          ],
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(currentUser.name,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18.0,
+                                      color: Colors.black)),
+                              const Text(
+                                'See your profile',
+                                style: TextStyle(color: Palette.facebookBlue),
+                              ),
+                            ],
                         ))
                       ],
                     ),

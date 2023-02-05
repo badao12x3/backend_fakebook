@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:bloc/bloc.dart';
@@ -10,6 +11,7 @@ import 'package:flutter/material.dart';
 
 import 'package:fakebook_frontend/constants/assets/palette.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import './screens/screens.dart';
 
 
@@ -21,6 +23,12 @@ void main() async{
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+
+  // getUserFromLocalStorage() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   String userPref = prefs.getString('user') ?? '{"user": "No userdata"}';
+  //   Map<String,dynamic> userMap = jsonDecode(userPref) as Map<String, dynamic>;
+  // }
 
   // This widget is the root of your application.
   @override
