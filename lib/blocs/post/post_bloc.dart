@@ -7,8 +7,6 @@ import 'package:fakebook_frontend/blocs/post/post_event.dart';
 import 'package:fakebook_frontend/blocs/post/post_state.dart';
 import 'package:fakebook_frontend/repositories/post_repository.dart';
 
-
-
 const throttleDuration = Duration(milliseconds: 100);
 
 EventTransformer<E> throttleDroppable<E>(Duration duration) {
@@ -32,6 +30,8 @@ class PostBloc extends Bloc<PostEvent, PostState> {
       _onPostFetched,
       transformer: throttleDroppable(throttleDuration),
     );
+
+    on<LikePost>(_onLikePost);
   }
 
   void _onPostReload(PostReload event, Emitter<PostState> emit) {
@@ -84,6 +84,10 @@ class PostBloc extends Bloc<PostEvent, PostState> {
     } catch (_) {
       emit(state.copyWith(status: PostStatus.failure));
     }
+  }
+
+  Future<void> _onLikePost(LikePost event, Emitter<PostState> emit) async {
+
   }
 
   @override

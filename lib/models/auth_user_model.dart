@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:equatable/equatable.dart';
 
-// sử dụng Equatable thì các trường bắt buộc là String
+// sử dụng Equatable thì các trường bắt buộc là final
 class AuthUser extends Equatable{
   final String code;
   final String message;

@@ -3,13 +3,14 @@ import 'package:fakebook_frontend/models/models.dart';
 
 class PostList {
   final List<Post> posts;
-  String new_items; // bỏ final
+  int new_items; // bỏ final
   String last_id; // bỏ final
 
   PostList({required this.posts, required this.new_items, required this.last_id});
 
-  PostList.initial(): posts = List<Post>.empty(growable: true), new_items = '', last_id = '';
+  PostList.initial(): posts = List<Post>.empty(growable: true), new_items = 0, last_id = '';
 
+  // tên là fromMap thì hợp lý hơn
   factory PostList.fromJson(Map<String, dynamic> json) {
     final postsData = json['data']['posts'] as List<dynamic>?;
     final posts = postsData != null ? postsData.map((postData) => Post.fromJson(postData)).toList() : <Post>[];
@@ -20,6 +21,7 @@ class PostList {
     );
   }
 
+  // tên là toMap thì hợp lý hơn
   Map<String, dynamic> toJson() {
     return {
       'posts': posts.map((post) => post.toJson()).toList(),
@@ -45,12 +47,12 @@ class Post extends Equatable {
   final int likes;
   final int comments;
   final Author author;
-  final String isLiked;
-  final String isBlocked;
+  final bool isLiked;
+  final bool isBlocked;
   final String? status;
-  final String canComment;
-  final String canEdit;
-  final String banned;
+  final bool canComment;
+  final bool canEdit;
+  final bool banned;
 
   Post({required this.id, required this.described, required this.createdAt, required this.updatedAt, this.images, this.video, required this.likes, required this.comments, required this.author, required this.isLiked, required this.isBlocked, this.status, required this.canComment, required this.canEdit, required this.banned});
 
@@ -66,12 +68,12 @@ class Post extends Equatable {
       likes: json["likes"] as int,
       comments: json["comments"] as int,
       author: Author.fromJson(json["author"]) as Author,
-      isLiked: json["is_liked"] as String,
+      isLiked: json["is_liked"] as bool,
       status: json["status"] as String?,
-      isBlocked: json["is_blocked"] as String,
-      canEdit: json["can_edit"] as String,
-      banned: json["banned"] as String,
-      canComment: json["can_comment"] as String,
+      isBlocked: json["is_blocked"] as bool,
+      canEdit: json["can_edit"] as bool,
+      banned: json["banned"] as bool,
+      canComment: json["can_comment"] as bool,
     );
   }
 

@@ -1,6 +1,6 @@
 import 'dart:convert';
-
-import 'package:fakebook_frontend/Routes.dart';
+import 'dart:io';
+import 'package:fakebook_frontend/routes.dart';
 import 'package:fakebook_frontend/blocs/auth/auth_bloc.dart';
 import 'package:fakebook_frontend/blocs/auth/auth_event.dart';
 import 'package:fakebook_frontend/screens/menu/sub_screens/settings_screen.dart';
@@ -18,7 +18,7 @@ class MenuScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     Future<void> handleLogout() async {
       // Bởi vì cập nhật trạng thái AuthState, nên không cần thiết pop. Nếu cố tình dùng pop sẽ mất context
-      // Navigator.popAndPushNamed(context, Routes.login_screen);
+      // Navigator.popAndPushNamed(context, Routes.login_screen); // Nếu pop thuần thì ra màn hình đen sì
       BlocProvider.of<AuthBloc>(context).add(Logout());
       // dù câu lệnh ở đằng sau nhưng vì là bất đồng bộ nên vẫn là AuthStatus.authenticated
       final user = BlocProvider.of<AuthBloc>(context).state.status;
@@ -144,7 +144,7 @@ class MenuScreen extends StatelessWidget {
                       ActionButton(
                         icon: Icons.exit_to_app,
                         buttonText: 'Close app',
-                        onPressed: () => print('Close app'),
+                        onPressed: () => exit(0),
                       ),
                       const SizedBox(height: 8.0),
                     ],
