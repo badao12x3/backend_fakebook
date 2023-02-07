@@ -73,7 +73,11 @@ class PostRepository {
           return LikePostModel.nullData();
         }
       } else if (response.statusCode == 403) {
-        // message: Not access - Tài khoản bị khóa
+        // Không like được do mình block nó hoặc nó block mình
+        if (body['details'] == 'Người viết đã chặn bạn / Bạn chặn người viết, do đó không thể like bài viết') {
+          return LikePostModel.nullData().copyWith(code: body['code'], message: 'Người viết đã chặn bạn / Bạn chặn người viết, do đó không thể like bài viết');
+        }
+        // Tài khoản bị khóa
         return LikePostModel.nullData().copyWith(code: body['code'], message: body['message']);
       } else {
         return LikePostModel.nullData();

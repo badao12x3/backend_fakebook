@@ -33,6 +33,14 @@ class PostList {
     };
   }
 
+  PostList copyWith({List<Post>? posts, int? new_items, String? last_id}) {
+    return PostList(
+        posts: posts ?? this.posts,
+        new_items: new_items ?? this.new_items,
+        last_id: last_id ?? this.last_id
+    );
+  }
+
   @override
   String toString() => toJson().toString();
 

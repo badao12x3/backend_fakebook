@@ -19,7 +19,7 @@ class LikePostModel {
     return LikePostModel(
       code: json["code"],
       message: json["message"],
-      likes: json["data"]["likes"],
+      likes: json["data"]["likes"], // mấy test case lỗi, sẽ dính null, nên hết sức cẩn thận
     );
   }
 

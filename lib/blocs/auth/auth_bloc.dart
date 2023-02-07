@@ -50,6 +50,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     final prefs = await SharedPreferences.getInstance();
     final successRemoveUserData = await prefs.remove('user');
     // print(successRemoveUserData);
+    authRepository.logout();
     emit(state.copyWith(status: AuthStatus.unauthenticated, authUser: AuthUser.initial()));
   }
 

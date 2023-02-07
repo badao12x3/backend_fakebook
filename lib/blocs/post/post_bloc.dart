@@ -32,7 +32,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
       transformer: throttleDroppable(throttleDuration),
     );
 
-    on<LikePost>(_onLikePost);
+    on<PostLike>(_onLikePost);
   }
 
   void _onPostReload(PostReload event, Emitter<PostState> emit) {
@@ -53,7 +53,11 @@ class PostBloc extends Bloc<PostEvent, PostState> {
     if (state.hasReachedMax) return;
     try {
       if (state.status == PostStatus.initial) {
-        final postList = await _postRepository.fetchPosts();
+        final postListData = await _postRepository.fetchPosts();
+        // lọc tất cả các bài viết bị banned
+        final mustFilteredPosts = postListData.posts;
+        mustFilteredPosts.retainWhere((post) => post.banned == false && post.isBlocked == false);
+        final postList = postListData.copyWith(posts: mustFilteredPosts);
         // print('Length: ${postList.posts.length}');
         emit(state.copyWith(status: PostStatus.loading));
         return emit(
@@ -65,8 +69,11 @@ class PostBloc extends Bloc<PostEvent, PostState> {
         );
       }
       final postListLength = state.postList.posts.length;
-      final finalPost = state.postList.posts[postListLength-1] as Post;
-      final postList = await _postRepository.fetchPosts(startIndex: postListLength, last_id: state.postList.last_id);
+      final finalPost = state.postList.posts[postListLength-1] as Post; // đây là 1 cách khác lấy last_id
+      final postListData = await _postRepository.fetchPosts(startIndex: postListLength, last_id: state.postList.last_id);
+      final mustFilteredPosts = postListData.posts;
+      mustFilteredPosts.retainWhere((post) => post.banned == false && post.isBlocked == false);
+      final postList = postListData.copyWith(posts: mustFilteredPosts);
       emit(state.copyWith(status: PostStatus.loading));
       if(postList.posts.isEmpty)
           emit(state.copyWith(status: PostStatus.success, hasReachedMax: true));
@@ -87,20 +94,46 @@ class PostBloc extends Bloc<PostEvent, PostState> {
     }
   }
 
-  Future<void> _onLikePost(LikePost event, Emitter<PostState> emit) async {
+  // không có cách nào show toast message mà không đọc state
+  Future<void> _onLikePost(PostLike event, Emitter<PostState> emit) async {
     final mustUpdatePost = event.post;
     final posts = state.postList.posts as List<Post>;
     final indexOfMustUpdatePost = posts.indexOf(mustUpdatePost);
     int likes = mustUpdatePost.isLiked ? mustUpdatePost.likes - 1 : mustUpdatePost.likes + 1;
-    posts..remove(mustUpdatePost)..insert(indexOfMustUpdatePost, mustUpdatePost.copyWith(likes: likes, isLiked: !mustUpdatePost.isLiked));
+    final newUpdatedPost = mustUpdatePost.copyWith(likes: likes, isLiked: !mustUpdatePost.isLiked);
+    posts..remove(mustUpdatePost)..insert(indexOfMustUpdatePost, newUpdatedPost);
     // emit(state.copyWith(postList: state.postList)); // RangeError: Invalid value: Not in inclusive range 0..5: -1
+    /*
+       Về lý thuyết, khi thay đổi trạng thái 1 post, thì chỉ post đó được render chứ không phải whole list.
+       Nhưng hiện tại, đang làm là tạo 1 PostList mới hoàn toàn, nhưng Flutter chỉ render toàn bộ Post (3-4) nằm trong vùng visible scroll view -> tạm chấp nhận được
+    */
     emit(state.copyWith(postList: PostList(posts: posts, new_items: state.postList.new_items, last_id: state.postList.last_id)));
     try {
       if (!mustUpdatePost.isLiked){
-        final likePost = _postRepository.likeHomePost(id: mustUpdatePost.id);
+        final likePost = await _postRepository.likeHomePost(id: mustUpdatePost.id);
+        if (likePost.code == '1009') {
+          // TC1: tài khoản của mình đột nhiên bị khóa, cần chuyển tới màn login ---> Không làm được, do không gọi tới AuthBloc mà update state
+          // TC2: Nếu mình block nó/nó block mình thì không like được
+          if (likePost.message == 'Người viết đã chặn bạn / Bạn chặn người viết, do đó không thể like bài viết') {
+            posts.remove(newUpdatedPost);
+            emit(state.copyWith(postList: PostList(posts: posts, new_items: state.postList.new_items, last_id: state.postList.last_id)));
+          }
+        } else if (likePost.code == '9991') {
+          // nếu like phải bài viết bị banned, lúc này mình chưa ấn reload ứng dụng nên chưa get lại API lọc posts nên sẽ xóa bài viết khỏi UI
+          posts.remove(newUpdatedPost);
+          emit(state.copyWith(postList: PostList(posts: posts, new_items: state.postList.new_items, last_id: state.postList.last_id)));
+        }
       }
       if(mustUpdatePost.isLiked) {
-        final ulikePost = _postRepository.unlikeHomePost(id: mustUpdatePost.id);
+        final unlikePost = await _postRepository.unlikeHomePost(id: mustUpdatePost.id);
+        if (unlikePost.code == '1009') {
+          // TC1: tài khoản của mình đột nhiên bị khóa, cần chuyển tới màn login ---> Không làm được, do không gọi tới AuthBloc mà update state
+          // TC2: Nếu mình block nó/nó block mình thì vẫn unlike được ----> không tồn tại TC2
+        } else if (unlikePost.code == '9991') {
+          // nếu unlike phải bài viết bị banned, lúc này mình chưa ấn reload ứng dụng nên chưa get lại API lọc posts nên sẽ xóa bài viết khỏi UI
+          posts.remove(newUpdatedPost);
+          emit(state.copyWith(postList: PostList(posts: posts, new_items: state.postList.new_items, last_id: state.postList.last_id)));
+        }
       }
 
     } catch(error) {

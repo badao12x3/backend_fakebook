@@ -1,16 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import '../../constants/assets/palette.dart';
-import '../../constants/localdata/post_data.dart';
 import '../../constants/localdata/video_data.dart';
-import '../../models/local/post_model.dart';
 import '../../models/local/video_model.dart';
-import '../home/widgets/post_container.dart';
 
 class WatchTab extends StatefulWidget {
   @override
@@ -156,7 +152,13 @@ class _VideoContainerState extends State<VideoContainer> {
   @override
   void initState() {
     super.initState();
-    _controller = YoutubePlayerController(initialVideoId: (YoutubePlayer.convertUrlToId(widget.url)!));
+    _controller = YoutubePlayerController(
+      initialVideoId: (YoutubePlayer.convertUrlToId(widget.url)!),
+      flags: const YoutubePlayerFlags(
+        autoPlay: false,
+        mute: true,
+      )
+    );
   }
 
   @override
@@ -167,14 +169,14 @@ class _VideoContainerState extends State<VideoContainer> {
 
   @override
   Widget build(BuildContext context) {
-    return  Stack(
+    return Stack(
       children:<Widget>[
         Container(
           // height: 236,
           // width: double.infinity,
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
-            child:  YoutubePlayer(controller: _controller)
+            child: YoutubePlayer(controller: _controller)
           ),
         ),
         Align(
@@ -226,7 +228,7 @@ class WatchSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return  Container(
+    return Container(
       margin: EdgeInsets.symmetric(horizontal: 6),
       child: ElevatedButton.icon(
         label: Text(title),
@@ -241,7 +243,6 @@ class WatchSection extends StatelessWidget {
             borderRadius: BorderRadius.circular(80),
           ),
         ),
-
       ),
     );
 

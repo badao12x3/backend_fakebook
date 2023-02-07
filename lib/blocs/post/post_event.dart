@@ -10,7 +10,7 @@ class PostFetched extends PostEvent {}
 
 class PostReload extends PostEvent {}
 
-class LikePost extends PostEvent {
+class PostLike extends PostEvent {
   final Post post;
-  LikePost({required this.post});
+  PostLike({required this.post});
 }

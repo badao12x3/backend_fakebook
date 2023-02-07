@@ -4,6 +4,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import 'package:fakebook_frontend/configuration.dart';
+
+import '../utils/token.dart';
 class AuthRepository {
   Future<AuthUser> login({required String phone, required String password}) async {
     // final response0 = await http.get(Uri.http(Configuration.baseUrlPhysicalDevice2, 'settings'));
@@ -42,4 +44,16 @@ class AuthRepository {
     }
     throw Exception('Error login');
   }
+
+  logout() async {
+    var token = await Token.getToken();
+    final url = Uri.http(Configuration.baseUrlConnect, 'account/logout');
+    http.post(url,
+        headers: <String, String>{
+          HttpHeaders.authorizationHeader: token,
+          'Content-Type': 'application/json; charset=UTF-8',
+        }
+    );
+  }
+
 }

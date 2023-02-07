@@ -1,6 +1,7 @@
 import 'package:fakebook_frontend/blocs/post/post_bloc.dart';
 import 'package:fakebook_frontend/blocs/post/post_event.dart';
 import 'package:fakebook_frontend/constants/assets/placeholder.dart';
+import 'package:fakebook_frontend/screens/watch/watch_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -8,6 +9,7 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 
 import 'package:fakebook_frontend/constants/assets/palette.dart';
 import 'package:fakebook_frontend/models/models.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class PostContainer extends StatelessWidget {
   final Post post;
@@ -15,10 +17,17 @@ class PostContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // print("#PostContainer: Rebuild ${post.id}");
+
+    // tính timeAgo
+    DateTime dt1 = DateTime.now();
+    DateTime dt2 = DateTime.parse(post.updatedAt);
+    final Duration diff = dt1.difference(dt2);
+    final String timeAgo = diff.inDays == 0 ? "${diff.inHours}h" : "${diff.inDays}d";
 
     void handleLikePost() {
-      print("Like post: ${post.id}");
-      BlocProvider.of<PostBloc>(context).add(LikePost(post: post));
+      // print("#PostContainer: Like post: ${post.id}");
+      BlocProvider.of<PostBloc>(context).add(PostLike(post: post));
     }
 
     return Container(
@@ -32,23 +41,42 @@ class PostContainer extends StatelessWidget {
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                 _PostHeader(avtUrl: post.author.avatar, name: post.author.name, timeAgo: '58m'),
+                 _PostHeader(avtUrl: post.author.avatar, name: post.author.name, timeAgo: timeAgo),
                   const SizedBox(height: 4),
                   Text(post.described)
                 ]
             ),
           ),
-          post.images != null ? Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child:  CachedNetworkImage(
-                  placeholder: (context, url) => CircularProgressIndicator(),
-                  imageUrl: post.images?.elementAt(0).url ?? ImagePlaceHolder.imagePlaceHolderOnline,
-                  errorWidget: (context, url, error) => const Image(
-                    image: AssetImage('assets/images/placeholder_image.png'),
-                    width: 200,
-                    height: 200)
-              )
+          const SizedBox(height: 4),
+          post.images != null ?
+          Container(
+            height: 200,
+            child: GridView.count(
+                padding: EdgeInsets.all(0),
+                crossAxisCount: post.images?.length == 1 ? 1 : 2,
+                mainAxisSpacing: 4,
+                crossAxisSpacing: 4,
+                children: post.images!.map((image) {
+                  return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 0),
+                      child: CachedNetworkImage(
+                          placeholder: (context, url) => CircularProgressIndicator(),
+                          imageUrl: image.url ?? ImagePlaceHolder.imagePlaceHolderOnline,
+                          errorWidget: (context, url, error) => const Image(
+                              image: AssetImage('assets/images/placeholder_image.png'),
+                              width: 200,
+                              height: 200)
+                      )
+                  );
+                }).toList(),
+            ),
+          )
+          : const SizedBox.shrink(),
+          post.video != null ? Padding(
+              padding: const EdgeInsets.symmetric(vertical: 0),
+              child: PostVideoContainer(url: post.video?.url ?? VideoPlaceHolder.videoPlaceHolderOnline),
           ) : const SizedBox.shrink(),
+          const SizedBox(height: 4),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             child: _PostStats(likes: post.likes, comments: post.comments, shares: 0, isLiked: post.isLiked, onLikePost: handleLikePost),
@@ -217,5 +245,44 @@ class _PostButton extends StatelessWidget {
   }
 }
 
+class PostVideoContainer extends StatefulWidget {
+  final String url;
+  PostVideoContainer({Key? key, required this.url}) : super(key: key);
+
+  @override
+  State<PostVideoContainer> createState() => _PostVideoContainerState();
+}
+
+class _PostVideoContainerState extends State<PostVideoContainer> {
+  late YoutubePlayerController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = YoutubePlayerController(
+        initialVideoId: (YoutubePlayer.convertUrlToId(widget.url)!),
+        flags: const YoutubePlayerFlags(
+          autoPlay: false,
+          mute: true,
+        )
+    );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _controller.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: YoutubePlayer(controller: _controller)
+      ),
+    );
+  }
+}
 
 
