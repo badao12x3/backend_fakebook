@@ -1,10 +1,12 @@
+import 'dart:convert';
+
 import 'package:equatable/equatable.dart';
 import 'package:fakebook_frontend/models/models.dart';
 
 class PostList {
-  final List<Post> posts;
+  final List<Post> posts; // không cần bỏ final vì growable: true
   int new_items; // bỏ final
-  String last_id; // bỏ final
+  String last_id; // bỏ final vì state.postList.last_id = postList.last_id; 'last_id' can't be used as a setter because it's final
 
   PostList({required this.posts, required this.new_items, required this.last_id});
 
@@ -14,6 +16,7 @@ class PostList {
   factory PostList.fromJson(Map<String, dynamic> json) {
     final postsData = json['data']['posts'] as List<dynamic>?;
     final posts = postsData != null ? postsData.map((postData) => Post.fromJson(postData)).toList() : <Post>[];
+
     return PostList(
       posts: posts,
       new_items: json['data']['new_items'],
@@ -35,6 +38,7 @@ class PostList {
 
 }
 
+// dùng chung cho cả get_list_posts và get_post
 class Post extends Equatable {
   final String id;
   final String described;
@@ -42,8 +46,6 @@ class Post extends Equatable {
   final String updatedAt;
   final List<AttachedImage>? images;
   final AttachedVideo? video;
-  // final List<int>? likedAccounts;
-  // final List<int>? commentList;
   final int likes;
   final int comments;
   final Author author;
@@ -54,17 +56,24 @@ class Post extends Equatable {
   final bool canEdit;
   final bool banned;
 
-  Post({required this.id, required this.described, required this.createdAt, required this.updatedAt, this.images, this.video, required this.likes, required this.comments, required this.author, required this.isLiked, required this.isBlocked, this.status, required this.canComment, required this.canEdit, required this.banned});
+  Post(
+      {required this.id, required this.described, required this.createdAt, required this.updatedAt, this.images, this.video, required this.likes, required this.comments, required this.author, required this.isLiked, required this.isBlocked, this.status, required this.canComment, required this.canEdit, required this.banned});
 
   factory Post.fromJson(Map<String, dynamic> json) {
     final imagesData = json["images"] as List<dynamic>?;
-    final images = imagesData != null ? imagesData.map((imageData) => AttachedImage.fromJson(imageData)).toList() : null;
+    final images = imagesData != null ? imagesData.map((imageData) =>
+        AttachedImage.fromJson(imageData)).toList() : null;
+
+    final videoData = json["video"] as Map<String, dynamic>?;
+    final video = videoData != null ? AttachedVideo.fromJson(videoData): null;
+
     return Post(
       id: json["id"] as String,
       described: json["described"] as String,
       createdAt: json["createdAt"] as String,
       updatedAt: json["updatedAt"] as String,
       images: images,
+      video: video,
       likes: json["likes"] as int,
       comments: json["comments"] as int,
       author: Author.fromJson(json["author"]) as Author,
@@ -83,6 +92,8 @@ class Post extends Equatable {
       "described": described,
       "createdAt": createdAt,
       "updatedAt": updatedAt,
+      if(images != null) "images": images!.map((image) => image.toJson()).toList(),
+      if(video != null) "video": video!.toJson(),
       "likes": likes,
       "comments": comments,
       "author": author.toJson(),
@@ -93,6 +104,42 @@ class Post extends Equatable {
       "banned": banned,
       "can_comment": canComment,
     };
+  }
+
+  Post copyWith({
+    String? id,
+    String? described,
+    String? createdAt,
+    String? updatedAt,
+    int? likes,
+    int? comments,
+    Author? author,
+    bool? isLiked,
+    String? status,
+    bool? isBlocked,
+    bool? canEdit,
+    bool? banned,
+    bool? canComment,
+    List<AttachedImage>? images,
+    AttachedVideo? video
+  }) {
+    return Post(
+        id: id ?? this.id,
+        described: described ?? this.described,
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
+        likes: likes ?? this.likes,
+        comments: comments ?? this.comments,
+        author: author ?? this.author,
+        isLiked: isLiked ?? this.isLiked,
+        status: status ?? this.status,
+        isBlocked: isBlocked ?? this.isBlocked,
+        canEdit: canEdit ?? this.canEdit,
+        banned: banned ?? this.banned,
+        canComment: canComment ?? this.canComment,
+        images: images ?? this.images,
+        video: video ?? this.video
+      );
   }
 
   @override

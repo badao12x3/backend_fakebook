@@ -1,6 +1,9 @@
+import 'package:fakebook_frontend/blocs/post/post_bloc.dart';
+import 'package:fakebook_frontend/blocs/post/post_event.dart';
 import 'package:fakebook_frontend/constants/assets/placeholder.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 import 'package:fakebook_frontend/constants/assets/palette.dart';
@@ -12,6 +15,12 @@ class PostContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    void handleLikePost() {
+      print("Like post: ${post.id}");
+      BlocProvider.of<PostBloc>(context).add(LikePost(post: post));
+    }
+
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 6),
       padding: const EdgeInsets.symmetric(vertical: 8),
@@ -42,7 +51,7 @@ class PostContainer extends StatelessWidget {
           ) : const SizedBox.shrink(),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: _PostStats(likes: post.likes, comments: post.comments, shares: 0),
+            child: _PostStats(likes: post.likes, comments: post.comments, shares: 0, isLiked: post.isLiked, onLikePost: handleLikePost),
           )
         ],
       ),
@@ -97,7 +106,10 @@ class _PostStats extends StatelessWidget {
   final int likes;
   final int comments;
   final int shares;
-  const _PostStats({Key? key, required this.likes, required this.comments, required this.shares}) : super(key: key);
+  final bool isLiked;
+  final Function() onLikePost;
+
+  const _PostStats({Key? key, required this.likes, required this.comments, required this.shares, required this.isLiked, required this.onLikePost}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -146,9 +158,11 @@ class _PostStats extends StatelessWidget {
           children: [
             Expanded(
               child: _PostButton(
-                icon: Icon(MdiIcons.thumbUpOutline, color: Colors.grey[600], size: 20),
+                icon: isLiked? Icon(Icons.thumb_up, color: Colors.blue, size: 20) : Icon(Icons.thumb_up_outlined, color: Colors.grey[600], size: 20),
                 label: 'Thích',
-                onTap: (){},
+                onTap: (){
+                  onLikePost();
+                },
               ),
             ),
             Expanded(

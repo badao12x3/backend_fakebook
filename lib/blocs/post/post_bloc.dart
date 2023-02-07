@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:fakebook_frontend/models/models.dart';
+import 'package:http/http.dart';
 import 'package:stream_transform/stream_transform.dart';
 
 import 'package:fakebook_frontend/blocs/post/post_event.dart';
@@ -87,7 +88,24 @@ class PostBloc extends Bloc<PostEvent, PostState> {
   }
 
   Future<void> _onLikePost(LikePost event, Emitter<PostState> emit) async {
+    final mustUpdatePost = event.post;
+    final posts = state.postList.posts as List<Post>;
+    final indexOfMustUpdatePost = posts.indexOf(mustUpdatePost);
+    int likes = mustUpdatePost.isLiked ? mustUpdatePost.likes - 1 : mustUpdatePost.likes + 1;
+    posts..remove(mustUpdatePost)..insert(indexOfMustUpdatePost, mustUpdatePost.copyWith(likes: likes, isLiked: !mustUpdatePost.isLiked));
+    // emit(state.copyWith(postList: state.postList)); // RangeError: Invalid value: Not in inclusive range 0..5: -1
+    emit(state.copyWith(postList: PostList(posts: posts, new_items: state.postList.new_items, last_id: state.postList.last_id)));
+    try {
+      if (!mustUpdatePost.isLiked){
+        final likePost = _postRepository.likeHomePost(id: mustUpdatePost.id);
+      }
+      if(mustUpdatePost.isLiked) {
+        final ulikePost = _postRepository.unlikeHomePost(id: mustUpdatePost.id);
+      }
 
+    } catch(error) {
+
+    }
   }
 
   @override
