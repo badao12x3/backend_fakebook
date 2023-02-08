@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:fakebook_frontend/models/like_post_model.dart';
+import 'package:fakebook_frontend/models/post_detail_model.dart';
 import 'package:fakebook_frontend/utils/token.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -46,7 +47,7 @@ class PostRepository {
 
   }
 
-  Future<LikePostModel> likeHomePost({required String id}) async {
+  Future<LikePost> likeHomePost({required String id}) async {
     try {
       var token = await Token.getToken();
       final url = Uri.http(Configuration.baseUrlConnect, 'post/like_post');
@@ -61,33 +62,33 @@ class PostRepository {
       );
       final body = json.decode(response.body) as Map<String, dynamic>;
       if (response.statusCode == 200) {
-        return LikePostModel.fromJson(body);
+        return LikePost.fromJson(body);
       } else if (response.statusCode == 400) {
         if (body['code'] == '506') {
           // message: Has been liked
-          return LikePostModel.nullData().copyWith(code: body['code'], message: body['message']);
+          return LikePost.nullData().copyWith(code: body['code'], message: body['message']);
         } else if (body['code'] == '9991') {
           // message: Post is banned
-          return LikePostModel.nullData().copyWith(code: body['code'], message: body['message']);
+          return LikePost.nullData().copyWith(code: body['code'], message: body['message']);
         } else {
-          return LikePostModel.nullData();
+          return LikePost.nullData();
         }
       } else if (response.statusCode == 403) {
         // Không like được do mình block nó hoặc nó block mình
         if (body['details'] == 'Người viết đã chặn bạn / Bạn chặn người viết, do đó không thể like bài viết') {
-          return LikePostModel.nullData().copyWith(code: body['code'], message: 'Người viết đã chặn bạn / Bạn chặn người viết, do đó không thể like bài viết');
+          return LikePost.nullData().copyWith(code: body['code'], message: 'Người viết đã chặn bạn / Bạn chặn người viết, do đó không thể like bài viết');
         }
         // Tài khoản bị khóa
-        return LikePostModel.nullData().copyWith(code: body['code'], message: body['message']);
+        return LikePost.nullData().copyWith(code: body['code'], message: body['message']);
       } else {
-        return LikePostModel.nullData();
+        return LikePost.nullData();
       }
     } catch(error) {
       throw Exception('${error} - Error to like post');
     }
   }
 
-  Future<LikePostModel> unlikeHomePost({required String id}) async {
+  Future<LikePost> unlikeHomePost({required String id}) async {
     try {
       var token = await Token.getToken();
       final url = Uri.http(Configuration.baseUrlConnect, 'post/unlike_post');
@@ -102,25 +103,45 @@ class PostRepository {
       );
       final body = json.decode(response.body) as Map<String, dynamic>;
       if (response.statusCode == 200) {
-        return LikePostModel.fromJson(body);
+        return LikePost.fromJson(body);
       } else if (response.statusCode == 400) {
         if (body['code'] == '506') {
           // message: Has been unliked
-          return LikePostModel.nullData().copyWith(code: body['code'], message: body['message']);
+          return LikePost.nullData().copyWith(code: body['code'], message: body['message']);
         } else if (body['code'] == '9991') {
           // message: Post is banned
-          return LikePostModel.nullData().copyWith(code: body['code'], message: body['message']);
+          return LikePost.nullData().copyWith(code: body['code'], message: body['message']);
         } else {
-          return LikePostModel.nullData();
+          return LikePost.nullData();
         }
       } else if (response.statusCode == 403) {
         // message: Not access - Tài khoản bị khóa
-        return LikePostModel.nullData().copyWith(code: body['code'], message: body['message']);
+        return LikePost.nullData().copyWith(code: body['code'], message: body['message']);
       } else {
-        return LikePostModel.nullData();
+        return LikePost.nullData();
       }
     } catch(error) {
       throw Exception('${error} - Error to unlike post');
+    }
+  }
+
+  Future<PostDetail?> fetchDetailPost({required String postId}) async {
+    final url = Uri.http(Configuration.baseUrlConnect, '/post/get_post/$postId');
+
+    var token = await Token.getToken();
+
+    final response = await http.get(url, headers: {
+      HttpHeaders.authorizationHeader: token,
+    });
+
+    if (response.statusCode == 200) {
+      final body = json.decode(response.body) as Map<String, dynamic>;
+      final postDetail = PostDetail.fromJson(body['data']);
+      return postDetail;
+    } else if (response.statusCode == 400) {
+      return null;
+    } else {
+      return null;
     }
   }
 

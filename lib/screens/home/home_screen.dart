@@ -1,7 +1,9 @@
 import 'package:fakebook_frontend/blocs/post/post_bloc.dart';
 import 'package:fakebook_frontend/blocs/post/post_event.dart';
+import 'package:fakebook_frontend/blocs/post_detail/post_detail_bloc.dart';
 import 'package:fakebook_frontend/common/widgets/common_widgets.dart';
 import 'package:fakebook_frontend/models/post_model.dart';
+import 'package:fakebook_frontend/repositories/post_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -17,10 +19,18 @@ import '../../blocs/post/post_state.dart';
 class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
+    PostRepository postRepository = PostRepository();
+    return MultiBlocProvider(providers: [
+      BlocProvider<PostBloc>(
         lazy: false,
-        create: (_) => PostBloc()..add(PostFetched()),
-        child: HomeScreenContent()
+        create: (_) => PostBloc(postRepository: postRepository)..add(PostFetched()),
+      ),
+      // BlocProvider<PostDetailBloc>(
+      //   lazy: false,
+      //   create: (_) => PostDetailBloc(postRepository: postRepository)
+      // )
+    ],
+      child: HomeScreenContent()
     );
   }
 }

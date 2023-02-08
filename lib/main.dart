@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 
 import 'package:fakebook_frontend/constants/assets/palette.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import './screens/screens.dart';
 
@@ -19,7 +20,7 @@ import './screens/screens.dart';
 void main() async{
   // debug global BLOC, suggesting turn off, please override in debug local BLOC
   Bloc.observer = SimpleBlocObserver();
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -64,6 +65,11 @@ class MyApp extends StatelessWidget {
             case Routes.nav_screen:
               return MaterialPageRoute(builder: (_) => NavScreen());
               break;
+            case Routes.post_detail_screen: {
+              // return MaterialPageRoute(builder: (_) => PostDetailScreen()); // null arguments ???
+              final postId = settings.arguments as String;
+              return MaterialPageRoute(builder: (_) => PostDetailScreen(postId: postId));
+            }
             default:
               return MaterialPageRoute(builder: (_) => NavScreen());
           }

@@ -1,6 +1,8 @@
 import 'package:fakebook_frontend/blocs/post/post_bloc.dart';
 import 'package:fakebook_frontend/blocs/post/post_event.dart';
 import 'package:fakebook_frontend/constants/assets/placeholder.dart';
+import 'package:fakebook_frontend/routes.dart';
+import 'package:fakebook_frontend/screens/home/widgets/home_widgets.dart';
 import 'package:fakebook_frontend/screens/watch/watch_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -30,6 +32,12 @@ class PostContainer extends StatelessWidget {
       BlocProvider.of<PostBloc>(context).add(PostLike(post: post));
     }
 
+    void handleOtherPostEvent(Map event) {
+      if(event['action'] == 'navigateToDetailPost') {
+        // print(post.id);
+        Navigator.pushNamed(context, Routes.post_detail_screen, arguments: post.id);
+      }
+    }
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 6),
       padding: const EdgeInsets.symmetric(vertical: 8),
@@ -79,7 +87,7 @@ class PostContainer extends StatelessWidget {
           const SizedBox(height: 4),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: _PostStats(likes: post.likes, comments: post.comments, shares: 0, isLiked: post.isLiked, onLikePost: handleLikePost),
+            child: _PostStats(likes: post.likes, comments: post.comments, shares: 0, isLiked: post.isLiked, onLikePost: handleLikePost, onHandleOtherPostEvent: (event) => handleOtherPostEvent(event)),
           )
         ],
       ),
@@ -136,50 +144,56 @@ class _PostStats extends StatelessWidget {
   final int shares;
   final bool isLiked;
   final Function() onLikePost;
+  final Function(Map event)? onHandleOtherPostEvent;
 
-  const _PostStats({Key? key, required this.likes, required this.comments, required this.shares, required this.isLiked, required this.onLikePost}) : super(key: key);
+  const _PostStats({Key? key, required this.likes, required this.comments, required this.shares, required this.isLiked, required this.onLikePost, this.onHandleOtherPostEvent}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(4),
-              decoration: const BoxDecoration(
-                color: Palette.facebookBlue,
-                shape: BoxShape.circle
+        GestureDetector(
+          onTap: () {
+            onHandleOtherPostEvent?.call({'action': 'navigateToDetailPost'});
+          },
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(4),
+                decoration: const BoxDecoration(
+                  color: Palette.facebookBlue,
+                  shape: BoxShape.circle
+                ),
+                child: const Icon(
+                  Icons.thumb_up,
+                  size: 10,
+                  color: Colors.white,
+                ),
               ),
-              child: const Icon(
-                Icons.thumb_up,
-                size: 10,
-                color: Colors.white,
+              const SizedBox(width: 4),
+              Expanded(
+                child: Text(
+                  '${likes}',
+                  style: TextStyle(
+                    color: Colors.grey[600],
+                  ),
+                ),
               ),
-            ),
-            const SizedBox(width: 4),
-            Expanded(
-              child: Text(
-                '${likes}',
+              Text(
+                '${comments} bình luận',
                 style: TextStyle(
                   color: Colors.grey[600],
                 ),
               ),
-            ),
-            Text(
-              '${comments} bình luận',
-              style: TextStyle(
-                color: Colors.grey[600],
-              ),
-            ),
-            const SizedBox(width: 12),
-            Text(
-              '${shares} lượt chia sẻ',
-              style: TextStyle(
-                color: Colors.grey[600],
-              ),
-            )
-          ],
+              const SizedBox(width: 12),
+              Text(
+                '${shares} lượt chia sẻ',
+                style: TextStyle(
+                  color: Colors.grey[600],
+                ),
+              )
+            ],
+          ),
         ),
         const Divider(),
         Row(
@@ -197,7 +211,9 @@ class _PostStats extends StatelessWidget {
               child: _PostButton(
                 icon: Icon(MdiIcons.commentOutline, color: Colors.grey[600], size: 20),
                 label: 'Bình luận',
-                onTap: (){},
+                onTap: (){
+                  onHandleOtherPostEvent?.call({'action': 'navigateToDetailPost'});
+                },
               ),
             ),
             Expanded(

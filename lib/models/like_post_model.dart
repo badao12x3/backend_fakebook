@@ -1,22 +1,22 @@
-class LikePostModel {
+class LikePost {
   final String code;
   final String message;
   final int likes;
 
-  LikePostModel({required this.code, required this.message, required this.likes});
+  LikePost({required this.code, required this.message, required this.likes});
 
-  LikePostModel.nullData(): code = '', message = '', likes = 0;
+  LikePost.nullData(): code = '', message = '', likes = 0;
 
-  LikePostModel copyWith({String? code, String? message, int? likes}) {
-    return LikePostModel(
+  LikePost copyWith({String? code, String? message, int? likes}) {
+    return LikePost(
       code: code ?? this.code,
       message: message ?? this.message,
       likes: likes ?? this.likes
     );
   }
 
-  factory LikePostModel.fromJson(Map<String, dynamic> json) {
-    return LikePostModel(
+  factory LikePost.fromJson(Map<String, dynamic> json) {
+    return LikePost(
       code: json["code"],
       message: json["message"],
       likes: json["data"]["likes"], // mấy test case lỗi, sẽ dính null, nên hết sức cẩn thận

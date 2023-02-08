@@ -17,10 +17,9 @@ EventTransformer<E> throttleDroppable<E>(Duration duration) {
 }
 
 class PostBloc extends Bloc<PostEvent, PostState> {
-  late final PostRepository _postRepository;
+  late final PostRepository postRepository;
 
-  PostBloc() : super(PostState.initial()) {
-    _postRepository = PostRepository();
+  PostBloc({required this.postRepository}) : super(PostState.initial()) {
 
     on<PostReload>(
       _onPostReload,
@@ -53,7 +52,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
     if (state.hasReachedMax) return;
     try {
       if (state.status == PostStatus.initial) {
-        final postListData = await _postRepository.fetchPosts();
+        final postListData = await postRepository.fetchPosts();
         // lọc tất cả các bài viết bị banned
         final mustFilteredPosts = postListData.posts;
         mustFilteredPosts.retainWhere((post) => post.banned == false && post.isBlocked == false);
@@ -70,7 +69,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
       }
       final postListLength = state.postList.posts.length;
       final finalPost = state.postList.posts[postListLength-1] as Post; // đây là 1 cách khác lấy last_id
-      final postListData = await _postRepository.fetchPosts(startIndex: postListLength, last_id: state.postList.last_id);
+      final postListData = await postRepository.fetchPosts(startIndex: postListLength, last_id: state.postList.last_id);
       final mustFilteredPosts = postListData.posts;
       mustFilteredPosts.retainWhere((post) => post.banned == false && post.isBlocked == false);
       final postList = postListData.copyWith(posts: mustFilteredPosts);
@@ -110,7 +109,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
     emit(state.copyWith(postList: PostList(posts: posts, new_items: state.postList.new_items, last_id: state.postList.last_id)));
     try {
       if (!mustUpdatePost.isLiked){
-        final likePost = await _postRepository.likeHomePost(id: mustUpdatePost.id);
+        final likePost = await postRepository.likeHomePost(id: mustUpdatePost.id);
         if (likePost.code == '1009') {
           // TC1: tài khoản của mình đột nhiên bị khóa, cần chuyển tới màn login ---> Không làm được, do không gọi tới AuthBloc mà update state
           // TC2: Nếu mình block nó/nó block mình thì không like được
@@ -125,7 +124,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
         }
       }
       if(mustUpdatePost.isLiked) {
-        final unlikePost = await _postRepository.unlikeHomePost(id: mustUpdatePost.id);
+        final unlikePost = await postRepository.unlikeHomePost(id: mustUpdatePost.id);
         if (unlikePost.code == '1009') {
           // TC1: tài khoản của mình đột nhiên bị khóa, cần chuyển tới màn login ---> Không làm được, do không gọi tới AuthBloc mà update state
           // TC2: Nếu mình block nó/nó block mình thì vẫn unlike được ----> không tồn tại TC2
