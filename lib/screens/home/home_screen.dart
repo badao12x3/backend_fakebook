@@ -19,19 +19,8 @@ import '../../blocs/post/post_state.dart';
 class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    PostRepository postRepository = PostRepository();
-    return MultiBlocProvider(providers: [
-      BlocProvider<PostBloc>(
-        lazy: false,
-        create: (_) => PostBloc(postRepository: postRepository)..add(PostFetched()),
-      ),
-      // BlocProvider<PostDetailBloc>(
-      //   lazy: false,
-      //   create: (_) => PostDetailBloc(postRepository: postRepository)
-      // )
-    ],
-      child: HomeScreenContent()
-    );
+      BlocProvider.of<PostBloc>(context).add(PostFetched());
+      return HomeScreenContent();
   }
 }
 
