@@ -4,6 +4,7 @@ import 'package:fakebook_frontend/constants/assets/palette.dart';
 import 'package:fakebook_frontend/screens/friend/friend_screen.dart';
 import 'package:fakebook_frontend/screens/home/home_screen.dart';
 import 'package:fakebook_frontend/screens/menu/menu_screen.dart';
+import 'package:fakebook_frontend/screens/personal/personal_screen.dart';
 import 'package:fakebook_frontend/screens/watch/watch_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -25,14 +26,11 @@ class _NavScreenState extends State<NavScreen> with TickerProviderStateMixin{
     HomeScreen(),
     FriendScreen(),
     WatchTab(),
-    Center(
-      child: Text("It's sunny here"),
-    ),
+    PersonalScreen(),
     Center(
       child: Text("It's not rainy here"),
     ),
     MenuScreen(),
-
   ];
 
   final List<Tab> _screenTabs = _icons.map((icon) => Tab(
