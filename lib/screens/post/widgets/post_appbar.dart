@@ -5,9 +5,10 @@ import 'package:flutter/services.dart';
 class PostAppbar extends StatefulWidget implements PreferredSizeWidget {
   final String title;
   final String action;
-  final TextEditingController textEditingController;
+  final TextEditingController? textEditingController;
+  final Map? extras;
 
-  const PostAppbar({Key? key, required this.title, required this.action, required this.textEditingController}) : super(key: key);
+  const PostAppbar({Key? key, required this.title, required this.action, this.textEditingController, this.extras}) : super(key: key);
 
   @override
   // TODO: implement preferredSize
@@ -19,23 +20,22 @@ class PostAppbar extends StatefulWidget implements PreferredSizeWidget {
 }
 
 class _PostAppbarState extends State<PostAppbar> {
-  bool allowedToAct = false;
-
+  late bool allowedToAct;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    widget.textEditingController.addListener(
+    allowedToAct = widget.title == "Bạn thế nào rồi?" ? true : false;
+    widget.textEditingController?.addListener(
       () {
         setState(() {
-          allowedToAct = widget.textEditingController.text.isNotEmpty;
+          allowedToAct = widget.textEditingController!.text.isNotEmpty;
         });
       });
   }
   @override
   Widget build(BuildContext context) {
-    print(allowedToAct);
     return AppBar(
       leading: Container(
         margin: EdgeInsets.symmetric(horizontal: 4),
@@ -47,6 +47,7 @@ class _PostAppbarState extends State<PostAppbar> {
           iconSize: 30,
           color: Colors.black,
           onPressed: () {
+            // pop context ở nút này sẽ không lưu lại giá trị status mới
             Navigator.pop(context);
           },
         ),
@@ -85,7 +86,9 @@ class _PostAppbarState extends State<PostAppbar> {
               //   fontSize: 20
               // )
             ),
-            onPressed: allowedToAct ? () {} : null,
+            onPressed: allowedToAct ? () {
+              Navigator.pop(context, widget.extras?['status']);
+            } : null,
           ),
         )
       ],

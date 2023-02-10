@@ -1,8 +1,8 @@
+import 'package:fakebook_frontend/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 import 'package:fakebook_frontend/models/local/models.dart';
-import '../../screens.dart';
 
 class CreatePostContainer extends StatelessWidget {
   final User currentUser;
@@ -23,13 +23,15 @@ class CreatePostContainer extends StatelessWidget {
                 backgroundColor: Colors.grey[200],
                 backgroundImage: CachedNetworkImageProvider(currentUser.imageUrl),
               ),
-              const SizedBox(width: 8.0),
+              const SizedBox(width: 10.0),
               Expanded(
-                child: TextField(
-                  decoration: InputDecoration.collapsed(hintText: 'Bạn đang nghĩ gì?'),
+                child: InkWell(
                   onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => CreatePostScreen()) );
+                    Navigator.pushNamed(context, Routes.create_post_screen);
                   },
+                  child: Container(
+                    child: Text('Bạn đang nghĩ gì?', style: TextStyle(fontSize: 16)),
+                  ),
                 ),
               ),
               TextButton.icon(

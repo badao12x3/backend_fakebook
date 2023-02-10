@@ -9,6 +9,7 @@ import 'package:fakebook_frontend/blocs/auth/auth_bloc.dart';
 import 'package:fakebook_frontend/blocs/auth/auth_event.dart';
 import 'package:fakebook_frontend/blocs/auth/auth_state.dart';
 import 'package:fakebook_frontend/configuration.dart';
+import 'package:fakebook_frontend/screens/post/emotion_screen.dart';
 import 'package:fakebook_frontend/simple_bloc_observer.dart';
 import 'package:flutter/material.dart';
 
@@ -76,15 +77,17 @@ class MyApp extends StatelessWidget {
               // Bởi vì cập nhật state bằng Bloc nên không cần push từ Login
               case Routes.login_screen:
                 return MaterialPageRoute(builder: (_) => LoginScreen());
-                break;
               case Routes.nav_screen:
                 return MaterialPageRoute(builder: (_) => NavScreen());
-                break;
               case Routes.post_detail_screen: {
                 // return MaterialPageRoute(builder: (_) => PostDetailScreen()); // null arguments ???
                 final postId = settings.arguments as String;
                 return MaterialPageRoute(builder: (_) => PostDetailScreen(postId: postId));
               }
+              case Routes.create_post_screen:
+                return MaterialPageRoute(builder: (_) => CreatePostScreen());
+              case Routes.emotion_screen:
+                return MaterialPageRoute(builder: (_) => EmotionScreen());
               default:
                 return MaterialPageRoute(builder: (_) => NavScreen());
             }
