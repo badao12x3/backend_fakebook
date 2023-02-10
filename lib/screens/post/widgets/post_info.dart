@@ -9,7 +9,7 @@ class PostInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print("#Post_info: $status");
+    // print("#Post_info: $status");
     return Container(
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,

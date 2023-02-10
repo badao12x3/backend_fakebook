@@ -51,6 +51,7 @@ dependencies:
   formz: ^0.4.1
   shared_preferences: ^2.0.17
   image_picker: ^0.8.6+1
+  video_player: ^2.5.1
 
 dev_dependencies:
   flutter_test:
