@@ -26,7 +26,7 @@ class MenuScreen extends StatelessWidget {
         body: CustomScrollView(
         slivers: [
           SliverAppBar(
-            backgroundColor: Colors.grey[100],
+            backgroundColor: Colors.white,
             automaticallyImplyLeading: false,
             title: const Text(
               'Menu',
