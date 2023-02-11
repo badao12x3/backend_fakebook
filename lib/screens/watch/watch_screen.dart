@@ -159,7 +159,7 @@ class _VideoListState extends State<VideoList> {
                   delegate: SliverChildBuilderDelegate((context, index){
                     return VideoPost(videoElement: state.videoList.videos[index] as VideoElement);
                   },
-                  childCount: state.videoList.videos.length)
+                      childCount: state.videoList.videos.length)
               );
 
           }
@@ -183,33 +183,38 @@ class VideoPost extends StatelessWidget {
       timeAgo = "Được tài trợ";
     } else timeAgo = diff.inDays == 0 ? "${diff.inHours}h" : "${diff.inDays}d";
 
-      return Container(
-        margin: const EdgeInsets.symmetric(vertical: 6),
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        color: Colors.white,
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _PostHeader(avtUrl: "https://i.pinimg.com/564x/5b/ac/75/5bac7554c5c6ce538a7dcf00b7de88c4.jpg", name: "Facebook", timeAgo: timeAgo),
-                    const SizedBox(height: 4),
-                    Text(videoElement.described)
-                  ]
-              ),
-            ),
-            VideoContainer(url: videoElement.video.url),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: _PostStats(likes: videoElement.likes),
-            )
-          ],
-        ),
-      );
+    void handleLikePost() {
+      // print("#PostContainer: Like post: ${post.id}");
+      BlocProvider.of<ListVideoBloc>(context).add(VideoPostLike(video: videoElement));
     }
+
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      color: Colors.white,
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _PostHeader(avtUrl: "https://i.pinimg.com/564x/5b/ac/75/5bac7554c5c6ce538a7dcf00b7de88c4.jpg", name: "Facebook", timeAgo: timeAgo),
+                  const SizedBox(height: 4),
+                  Text(videoElement.described)
+                ]
+            ),
+          ),
+          VideoContainer(url: videoElement.video.url),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: _PostStats(likes: videoElement.likes, isLiked: videoElement.isLiked, onLikePost: handleLikePost),
+          )
+        ],
+      ),
+    );
   }
+}
 
 
 
@@ -379,7 +384,9 @@ class _PostHeader extends StatelessWidget {
 
 class _PostStats extends StatelessWidget {
   final int likes;
-  const _PostStats({Key? key, required this.likes}) : super(key: key);
+  final bool isLiked;
+  final Function() onLikePost;
+  const _PostStats({Key? key, required this.likes, required this.isLiked, required this.onLikePost}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -415,10 +422,12 @@ class _PostStats extends StatelessWidget {
           children: [
             Expanded(
               child: _PostButton(
-                icon: Icon(MdiIcons.thumbUpOutline, color: Colors.grey[600], size: 20),
+                icon: isLiked? Icon(Icons.thumb_up, color: Colors.blue, size: 20) : Icon(Icons.thumb_up_outlined, color: Colors.grey[600], size: 20),
                 label: 'Thích',
-                onTap: (){},
-              ),
+                onTap: (){
+                  onLikePost();
+                },
+              )
             ),
             Expanded(
               child: _PostButton(
@@ -471,4 +480,3 @@ class _PostButton extends StatelessWidget {
     );
   }
 }
-

@@ -57,14 +57,14 @@ class VideoElement extends Equatable{
   final bool isLiked;
 
   VideoElement copyWith({
-    required String id,
-    required String described,
-    required VideoVideo video,
-    required bool isAdsCampaign,
-    required String createdAt,
-    required String updatedAt,
-    required int likes,
-    required bool isLiked,
+     String? id,
+     String? described,
+     VideoVideo? video,
+     bool? isAdsCampaign,
+     String? createdAt,
+     String? updatedAt,
+     int? likes,
+     bool? isLiked,
   }) =>
       VideoElement(
         id: id ?? this.id,

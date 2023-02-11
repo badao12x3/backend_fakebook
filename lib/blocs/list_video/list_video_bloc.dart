@@ -29,6 +29,7 @@ class ListVideoBloc extends Bloc<ListVideoEvent, ListVideoState> {
       transformer: throttleDroppable(throttleDuration),
     );
 
+    on<VideoPostLike>(_onLikeVideoPost);
   }
 
   void _onListVideoReload(ListVideoReload event, Emitter<ListVideoState> emit) {
@@ -60,6 +61,18 @@ class ListVideoBloc extends Bloc<ListVideoEvent, ListVideoState> {
       emit(state.copyWith(status: ListVideoStatus.failure));
     }
   }
+
+  Future<void> _onLikeVideoPost(VideoPostLike event, Emitter<ListVideoState> emit) async {
+    final mustUpdatePost = event.video as VideoElement;
+    final videos = state.videoList.videos as List<VideoElement>;
+    final indexOfMustUpdatePost = videos.indexOf(mustUpdatePost);
+    int likes = mustUpdatePost.isLiked ? mustUpdatePost.likes - 1 : mustUpdatePost.likes + 1;
+    final newUpdatedPost = mustUpdatePost.copyWith(likes: likes, isLiked: !mustUpdatePost.isLiked);
+    videos..remove(mustUpdatePost)..insert(indexOfMustUpdatePost, newUpdatedPost);
+
+    emit(state.copyWith(videoList: VideoList(videos: videos)));
+  }
+
   @override
   void onError(Object error, StackTrace stackTrace) {
     super.onError(error, stackTrace);
