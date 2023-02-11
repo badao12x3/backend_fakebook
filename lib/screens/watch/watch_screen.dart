@@ -1,12 +1,26 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:fakebook_frontend/blocs/list_video/list_video_bloc.dart';
+import 'package:fakebook_frontend/blocs/list_video/list_video_event.dart';
+import 'package:fakebook_frontend/blocs/list_video/list_video_state.dart';
+import 'package:fakebook_frontend/models/video_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
+import '../../common/widgets/bottom_loader.dart';
 import '../../constants/assets/palette.dart';
 import '../../constants/localdata/video_data.dart';
 import '../../models/local/video_model.dart';
+
+class WatchScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    BlocProvider.of<ListVideoBloc>(context).add(ListVideoFetched());
+    return WatchTab();
+  }
+}
 
 class WatchTab extends StatefulWidget {
   @override
@@ -16,6 +30,10 @@ class WatchTab extends StatefulWidget {
 class _WatchTabState extends State<WatchTab> {
   Color backgroundColor = Colors.white;
 
+  void initState(){
+    context.read<ListVideoBloc>().add(ListVideoFetched());
+    super.initState();
+  }
   changeBackgroundColor() {
     setState(() {
       backgroundColor = Colors.black;
@@ -23,120 +41,177 @@ class _WatchTabState extends State<WatchTab> {
   }
   @override
   Widget build(BuildContext context) {
-    return CustomScrollView(
-      slivers: [
-        SliverAppBar(
-          systemOverlayStyle: SystemUiOverlayStyle(
-            systemNavigationBarColor: Colors.white, // Navigation bar
-            statusBarColor: Colors.lightBlue, // Status bar
-          ),
-          floating: true,
-          automaticallyImplyLeading: false,
-          // pinned: true,
-          title: Text(
-              'Watch',
-              style: TextStyle(color: Colors.black, fontSize: 28.0, fontWeight: FontWeight.bold)
-          ),
-          actions: [
-            Container(
-              height: 42.0,
-              width: 42.0,
-              margin: EdgeInsets.symmetric(horizontal: 0),
-              decoration: BoxDecoration(
-                color: Colors.grey[200],
-                shape: BoxShape.circle,
+    return RefreshIndicator(
+        onRefresh: () async {
+          context.read<ListVideoBloc>().add(ListVideoReload());
+          context.read<ListVideoBloc>().add(ListVideoFetched());
+          return Future<void>.delayed(const Duration(seconds: 2));
+        },
+        child: CustomScrollView(
+          slivers: [
+            SliverAppBar(
+              systemOverlayStyle: SystemUiOverlayStyle(
+                systemNavigationBarColor: Colors.white, // Navigation bar
+                statusBarColor: Colors.lightBlue, // Status bar
+              ),
+              floating: true,
+              automaticallyImplyLeading: false,
+              // pinned: true,
+              title: Text(
+                  'Watch',
+                  style: TextStyle(color: Colors.black, fontSize: 28.0, fontWeight: FontWeight.bold)
+              ),
+              actions: [
+                Container(
+                  height: 42.0,
+                  width: 42.0,
+                  margin: EdgeInsets.symmetric(horizontal: 0),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    shape: BoxShape.circle,
 
-              ),
-              child: IconButton(
-                splashColor: Colors.transparent,
-                highlightColor: Colors.transparent,
-                icon: Icon(Icons.person),
-                iconSize: 28,
-                color: Colors.black,
-                onPressed: () {},
-              ),
-            ),
-            Container(
-              height: 42.0,
-              width: 42.0,
-              margin: EdgeInsets.symmetric(horizontal: 10),
-              decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  shape: BoxShape.circle
-              ),
-              child: IconButton(
-                splashColor: Colors.transparent,
-                highlightColor: Colors.transparent,
-                icon: Icon(Icons.search),
-                iconSize: 30,
-                color: Colors.black,
-                onPressed: () {},
-              ),
-            )
-          ],
-          backgroundColor: Colors.white,
-          bottom: PreferredSize(
-            preferredSize: const Size.fromHeight(47.0),
-            child: Transform.translate(
-                offset: const Offset(6, 0),
-                child: Container(
-                  height: 50,
-                  color: Colors.white,
-                  child: Material(
-                    color: Colors.transparent,
-                    child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: 1,
-                        itemBuilder: (BuildContext context, int index){
-                          return Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 0),
-                              child: WatchFilterSection(changeBackgroundColor: changeBackgroundColor)
-                          );
-                        }
-                    ),
+                  ),
+                  child: IconButton(
+                    splashColor: Colors.transparent,
+                    highlightColor: Colors.transparent,
+                    icon: Icon(Icons.person),
+                    iconSize: 28,
+                    color: Colors.black,
+                    onPressed: () {},
+                  ),
+                ),
+                Container(
+                  height: 42.0,
+                  width: 42.0,
+                  margin: EdgeInsets.symmetric(horizontal: 10),
+                  decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      shape: BoxShape.circle
+                  ),
+                  child: IconButton(
+                    splashColor: Colors.transparent,
+                    highlightColor: Colors.transparent,
+                    icon: Icon(Icons.search),
+                    iconSize: 30,
+                    color: Colors.black,
+                    onPressed: () {},
                   ),
                 )
-
-            ),
-          ),
-        ),
-
-        SliverList(
-            delegate: SliverChildBuilderDelegate((context, index){
-              final Video post = videos[index];
-              return Container(
-                margin: const EdgeInsets.symmetric(vertical: 6),
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                color: Colors.white,
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _PostHeader(avtUrl: post.user.imageUrl, name: post.user.name, timeAgo: post.createdTime.toString()),
-                            const SizedBox(height: 4),
-                            Text(post.described)
-                          ]
+              ],
+              backgroundColor: Colors.white,
+              bottom: PreferredSize(
+                preferredSize: const Size.fromHeight(47.0),
+                child: Transform.translate(
+                    offset: const Offset(6, 0),
+                    child: Container(
+                      height: 50,
+                      color: Colors.white,
+                      child: Material(
+                        color: Colors.transparent,
+                        child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: 1,
+                            itemBuilder: (BuildContext context, int index){
+                              return Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 0),
+                                  child: WatchFilterSection(changeBackgroundColor: changeBackgroundColor)
+                              );
+                            }
+                        ),
                       ),
-                    ),
-                    VideoContainer(url: post.videoUrl),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      child: _PostStats(likes: post.likes),
                     )
-                  ],
+
                 ),
-              );
-            },
-            childCount: videos.length)
+              ),
+            ),
+            VideoList()
+          ],
         )
-      ],
     );
 
   }
 }
+
+class VideoList extends StatefulWidget {
+
+  const VideoList({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  State<VideoList> createState() => _VideoListState();
+}
+class _VideoListState extends State<VideoList> {
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<ListVideoBloc,ListVideoState>(
+        builder:  (context, state) {
+          // switch case hết giá trị thì BlocBuilder sẽ tự hiểu không bao giờ rơi vào trường hợp null ---> Siêu ghê
+          switch (state.status) {
+            case ListVideoStatus.initial:
+              return const SliverToBoxAdapter(child: Center(child: CircularProgressIndicator()));
+            case ListVideoStatus.loading:
+              return const SliverToBoxAdapter(child: Center(child: CircularProgressIndicator()));
+            case ListVideoStatus.failure:
+              return const SliverToBoxAdapter(child: Center(child: Text('Failed to fetch posts')));
+            case ListVideoStatus.success:
+              return SliverList(
+                  delegate: SliverChildBuilderDelegate((context, index){
+                    return VideoPost(videoElement: state.videoList.videos[index] as VideoElement);
+                  },
+                  childCount: state.videoList.videos.length)
+              );
+
+          }
+        }
+    );
+  }
+
+}
+
+class VideoPost extends StatelessWidget {
+  final VideoElement videoElement;
+  const VideoPost({Key? key, required this.videoElement}) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    // tính timeAgo
+    DateTime dt1 = DateTime.now();
+    DateTime dt2 = DateTime.parse(videoElement.updatedAt);
+    final Duration diff = dt1.difference(dt2);
+    String timeAgo;
+    if(videoElement.isAdsCampaign) {
+      timeAgo = "Được tài trợ";
+    } else timeAgo = diff.inDays == 0 ? "${diff.inHours}h" : "${diff.inDays}d";
+
+      return Container(
+        margin: const EdgeInsets.symmetric(vertical: 6),
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        color: Colors.white,
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _PostHeader(avtUrl: "https://i.pinimg.com/564x/5b/ac/75/5bac7554c5c6ce538a7dcf00b7de88c4.jpg", name: "Facebook", timeAgo: timeAgo),
+                    const SizedBox(height: 4),
+                    Text(videoElement.described)
+                  ]
+              ),
+            ),
+            VideoContainer(url: videoElement.video.url),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: _PostStats(likes: videoElement.likes),
+            )
+          ],
+        ),
+      );
+    }
+  }
+
+
 
 class VideoContainer extends StatefulWidget {
   final String url;
@@ -170,6 +245,7 @@ class _VideoContainerState extends State<VideoContainer> {
   @override
   Widget build(BuildContext context) {
     return Stack(
+      // fit: StackFit.expand,
       children:<Widget>[
         Container(
           // height: 236,
@@ -187,11 +263,20 @@ class _VideoContainerState extends State<VideoContainer> {
             onPressed: () {},
           ),
         ),
-        Align(
-          alignment: Alignment.bottomCenter,
-          child: IconButton(
-            icon: const Icon(Icons.volume_up_outlined),
-            onPressed: () {},
+        Positioned(
+          bottom: 15,
+          right: 10,
+          child: CircleAvatar(
+            radius: 17,
+            backgroundColor: Colors.black,
+            child: IconButton(
+              icon: const Icon(
+                Icons.volume_up_outlined,
+                color: Colors.white,
+                size: 20,),
+              onPressed: () {},
+
+            ),
           ),
         )
       ],
