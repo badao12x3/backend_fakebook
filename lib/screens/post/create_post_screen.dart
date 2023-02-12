@@ -1,7 +1,10 @@
 import 'dart:io';
 
+import 'package:fakebook_frontend/blocs/post/post_bloc.dart';
+import 'package:fakebook_frontend/blocs/post/post_event.dart';
 import 'package:fakebook_frontend/routes.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:video_player/video_player.dart';
 import 'package:flutter/material.dart';
@@ -29,11 +32,10 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
 
   // chức năng ảnh/video
   final ImagePicker _picker = ImagePicker();
-  List<XFile>? _imageFileList;
+  List<XFile>? _imageFileList; // luồng vẫn hơi củ chuối
   dynamic _pickImageError;
-  late VideoPlayerController _controller;
+  late VideoPlayerController _controller; // tính năng video chưa được
   bool isVideo = false;
-  String? _retrieveDataError;
 
   void _setImageFileListFromFile(XFile? value) {
     _imageFileList = (value == null ? null : <XFile>[value]);
@@ -122,7 +124,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
       );
     } else {
       return const Text(
-        'You have not yet picked an image.',
+        'Bạn chưa chọn ảnh nào',
         textAlign: TextAlign.center,
       );
     }
@@ -132,7 +134,6 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
     if (isVideo) {
       return _previewVideo();
     } else {
-
       return _previewImages();
     }
   }
@@ -140,7 +141,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   Future<void> _onImageButtonPressed(ImageSource source, {BuildContext? context, bool isMultiImage = false, required bool isVideo}) async {
     if (isVideo) {
       setState(() {
-        isVideo = true;
+        this.isVideo = true;
       });
       final XFile? file = await _picker.pickVideo(source: source, maxDuration: const Duration(seconds: 10));
       await _playVideo(file);
@@ -169,30 +170,6 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
     }
   }
 
-  Future<void> retrieveLostData() async {
-    final LostDataResponse response = await _picker.retrieveLostData();
-    if (response.isEmpty) {
-      return;
-    }
-    if (response.file != null) {
-      if (response.type == RetrieveType.video) {
-        isVideo = true;
-        await _playVideo(response.file);
-      } else {
-        isVideo = false;
-        setState(() {
-          if (response.files == null) {
-            _setImageFileListFromFile(response.file);
-          } else {
-            _imageFileList = response.files;
-          }
-        });
-      }
-    } else {
-      _retrieveDataError = response.exception!.code;
-    }
-  }
-
   @override
   void initState() {
     // TODO: implement initState
@@ -207,14 +184,22 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
 
   }
 
+  handleCreatePost() {
+    final described = textEditingController.text;
+    // print(_imageFileList?[0]);
+    context.read<PostBloc>().add(PostAdd(described: described, status: status, imageFileList: _imageFileList));
+  }
+
   @override
   Widget build(BuildContext context) {
+    // print("#Create_post_screen: Rebuild");
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: PostAppbar(
         title: 'Tạo bài viết',
         action: 'Đăng',
         textEditingController: textEditingController,
+        onHandleCreatePost: handleCreatePost,
       ),
       body: Stack(
         children: [
@@ -243,36 +228,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                       ),
                     ),
                     Container(
-                      child: !kIsWeb && defaultTargetPlatform == TargetPlatform.android
-                          ? FutureBuilder<void>(
-                        future: retrieveLostData(),
-                        builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
-                          print(snapshot.connectionState);
-                          switch (snapshot.connectionState) {
-                            case ConnectionState.none:
-                            case ConnectionState.waiting:
-                              return const Text(
-                                'You have not yet picked an image.',
-                                textAlign: TextAlign.center,
-                              );
-                            case ConnectionState.done:
-                              return _handlePreview();
-                            case ConnectionState.active:
-                              if (snapshot.hasError) {
-                                return Text(
-                                  'Pick image/video error: ${snapshot.error}}',
-                                  textAlign: TextAlign.center,
-                                );
-                              } else {
-                                return const Text(
-                                  'You have not yet picked an image.',
-                                  textAlign: TextAlign.center,
-                                );
-                              }
-                          }
-                        },
-                      )
-                          : _handlePreview(),
+                        child: _imageFileList != null ? _handlePreview() : const SizedBox.shrink(),
                     ),
                   ],
                 ),
@@ -281,15 +237,15 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
           Positioned.fill(
               child: NotificationListener<DraggableScrollableNotification>(
                 onNotification: (notification) {
-                  print("${notification.extent}");
+                  // print("${notification.extent}");
                   if (notification.extent <= 0.25) {
-                    setState(() {
-                      isMinimizeDSS = true;
-                    });
+                    // setState(() {
+                    //   isMinimizeDSS = true;
+                    // });
                   } else {
-                    setState(() {
-                      isMinimizeDSS = false;
-                    });
+                    // setState(() {
+                    //   isMinimizeDSS = false;
+                    // });
                   }
                   return true;
                 },
@@ -298,7 +254,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                   maxChildSize: 0.6,
                   minChildSize: 0.1,
                   builder: (_, controller) {
-                    if (!isMinimizeDSS)
+                    // if (!isMinimizeDSS)
                       return Material(
                         elevation: 20,
                         borderRadius: BorderRadius.vertical(
@@ -391,41 +347,42 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                           ],
                         ),
                       );
-                    else
-                      return Material(
-                        elevation: 20,
-                        borderRadius: BorderRadius.vertical(
-                          top: Radius.circular(20)
-                        ),
-                        color: Colors.white,
-                        child: Column(
-                          children: [
-                            Center(
-                              child: Container(
-                                margin: EdgeInsets.fromLTRB(0, 20, 0, 10),
-                                width: 40,
-                                color: Colors.grey[400],
-                                height: 2,
-                              ),
-                            ),
-                            SingleChildScrollView(
-                              controller: controller,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Icon(Icons.photo, color: Colors.green),
-                                  Icon(Icons.photo_library, color: Colors.green),
-                                  Icon(Icons.camera, color: Colors.red),
-                                  Icon(Icons.video_library, color: Colors.red),
-                                  Icon(Icons.camera, color: Colors.red),
-                                  Icon(Icons.emoji_emotions_outlined, color: Colors.orange),
-                                  Icon(Icons.text_format, color: Colors.blue, size: 28),
-                                ],
-                              ),
-                            )
-                          ],
-                        ),
-                      );
+                      // bị rebuild liên tục nên lag lắm
+                    // else
+                    //   return Material(
+                    //     elevation: 20,
+                    //     borderRadius: BorderRadius.vertical(
+                    //       top: Radius.circular(20)
+                    //     ),
+                    //     color: Colors.white,
+                    //     child: Column(
+                    //       children: [
+                    //         Center(
+                    //           child: Container(
+                    //             margin: EdgeInsets.fromLTRB(0, 20, 0, 10),
+                    //             width: 40,
+                    //             color: Colors.grey[400],
+                    //             height: 2,
+                    //           ),
+                    //         ),
+                    //         SingleChildScrollView(
+                    //           controller: controller,
+                    //           child: Row(
+                    //             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    //             children: [
+                    //               Icon(Icons.photo, color: Colors.green),
+                    //               Icon(Icons.photo_library, color: Colors.green),
+                    //               Icon(Icons.camera, color: Colors.red),
+                    //               Icon(Icons.video_library, color: Colors.red),
+                    //               Icon(Icons.camera, color: Colors.red),
+                    //               Icon(Icons.emoji_emotions_outlined, color: Colors.orange),
+                    //               Icon(Icons.text_format, color: Colors.blue, size: 28),
+                    //             ],
+                    //           ),
+                    //         )
+                    //       ],
+                    //     ),
+                    //   );
                   }
                 ),
               )

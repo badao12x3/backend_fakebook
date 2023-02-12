@@ -7,8 +7,9 @@ class PostAppbar extends StatefulWidget implements PreferredSizeWidget {
   final String action;
   final TextEditingController? textEditingController;
   final Map? extras;
+  final Function()? onHandleCreatePost;
 
-  const PostAppbar({Key? key, required this.title, required this.action, this.textEditingController, this.extras}) : super(key: key);
+  const PostAppbar({Key? key, required this.title, required this.action, this.textEditingController, this.extras, this.onHandleCreatePost}) : super(key: key);
 
   @override
   // TODO: implement preferredSize
@@ -88,6 +89,7 @@ class _PostAppbarState extends State<PostAppbar> {
             ),
             onPressed: allowedToAct ? () {
               Navigator.pop(context, widget.extras?['status']);
+              widget.onHandleCreatePost?.call();
             } : null,
           ),
         )
