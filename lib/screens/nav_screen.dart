@@ -56,7 +56,6 @@ class _NavScreenState extends State<NavScreen> with TickerProviderStateMixin{
     // final user = BlocProvider.of<AuthBloc>(context).state.authUser;
     // final token = user.token;
     // final userId = user.id;
-    // print("$token, $userId");
     return Scaffold(
       body: TabBarView(
         controller: _tabController,
