@@ -10,8 +10,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 class FriendRequestReceivedRepository {
   Future<FriendRequestReceivedList> fetchRequestReceivedFriends(
       {String? cur_id}) async {
-    final url = Uri.http(Configuration.baseUrlConnect,
-        '/account/get_requested_friends', {'_id': '$cur_id'});
+    final url = Uri.http(
+        Configuration.baseUrlConnect, '/account/get_requested_friends');
 
     // get token from local storage/cache
     final prefs = await SharedPreferences.getInstance();
