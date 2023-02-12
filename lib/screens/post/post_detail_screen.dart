@@ -19,7 +19,7 @@ class PostDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     // null. Hơi lạ
     // final String postId = ModalRoute.of(context)?.settings.arguments as String;
-    print("#PostDetailScreen: " + postId);
+    // print("#PostDetailScreen: " + postId);
     BlocProvider.of<PostDetailBloc>(context).add(PostDetailFetched(postId: postId));
     return Scaffold(
         backgroundColor: Colors.white,

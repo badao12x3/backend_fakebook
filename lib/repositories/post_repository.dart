@@ -217,8 +217,7 @@ class PostRepository {
       if(status != null) request.fields["status"] = status;
 
       if(imageList != null && imageList.length == 1) {
-        print("Up ảnh");
-        print(imageList[0].path);
+        // print(imageList[0].path);
         var ext = imageList[0].path.split('.').last;
         var pic = await http.MultipartFile.fromPath("image", imageList[0].path, contentType: MediaType('image', ext));
         request.files.add(pic);

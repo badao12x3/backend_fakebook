@@ -35,7 +35,6 @@ class HomeScreenContent extends StatefulWidget {
 
 class _HomeScreenContentState extends State<HomeScreenContent> {
   final _scrollController = ScrollController();
-  bool loadMore = false;
   @override
   void initState() {
     super.initState();
@@ -51,14 +50,8 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
   }
 
   void _onScroll() {
-    if (_isBottom && !loadMore){
-      setState((){
-        loadMore = true;
-      });
+    if (_isBottom){
       context.read<PostBloc>().add(PostFetched());
-      setState((){
-        loadMore = false;
-      });
     }
   }
 

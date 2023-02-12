@@ -16,21 +16,35 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../blocs/personal_post/personal_post_state.dart';
 import '../../common/widgets/bottom_loader.dart';
+import '../../models/auth_user_model.dart';
 import '../home/widgets/post_container.dart';
 
 class PersonalScreen extends StatefulWidget {
+  final String? accountId;
+
+  PersonalScreen({this.accountId});
+
   @override
   State<PersonalScreen> createState() => _PersonalScreenState();
 }
 
 class _PersonalScreenState extends State<PersonalScreen> {
   final _scrollController = ScrollController();
-  bool loadMore = false;
+
+  late final AuthUser authUser;
+  late final String? accountId;
+  late final String userId; // dùng chung cho cả mình và người khác
+  late final bool isMe;
 
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
+
+    authUser = BlocProvider.of<AuthBloc>(context).state.authUser;
+    accountId = widget.accountId;
+    userId = accountId ?? authUser.id;
+    isMe = accountId != null ? false : true;
   }
 
   @override
@@ -51,30 +65,36 @@ class _PersonalScreenState extends State<PersonalScreen> {
 
 
   void _onScroll() {
-    if (_isBottom && !loadMore){
-      setState((){
-        loadMore = true;
-      });
-      context.read<PersonalPostBloc>().add(PersonalPostFetched(accountId: '63bbff18fc13ae649300082a'));
-      setState((){
-        loadMore = false;
-      });
+    if (_isBottom){
+      context.read<PersonalPostBloc>().add(PersonalPostFetched(accountId: userId));
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final user = BlocProvider.of<AuthBloc>(context).state.authUser;
-    final userId = user.id;
+    // print("#PersonalScreen: $accountId");
+
     // final postList = BlocProvider.of<PostBloc>(context).state;
     // print("#PersonalScreen: " + postList.postList.toString());
+    context.read<PersonalPostBloc>().add(PersonalPostReload(accountId: userId));
     context.read<PersonalPostBloc>().add(PersonalPostFetched(accountId: userId));
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
-        title: Container(
-          alignment: Alignment.center,
-          child: Text(
+        automaticallyImplyLeading: false,
+        leading: Builder(
+          builder: (BuildContext context) {
+            return isMe ?
+              Icon(Icons.menu, color: Colors.black, size: 30) :
+              IconButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  icon: Icon(Icons.arrow_back_ios, color: Colors.black)
+              );
+          },
+        ),
+        title: Text(
             currentUser.name,
             textAlign: TextAlign.center,
             style: const TextStyle(
@@ -83,7 +103,7 @@ class _PersonalScreenState extends State<PersonalScreen> {
               fontSize: 18.0,
             ),
           ),
-        ),
+        centerTitle: true
       ),
       body: RefreshIndicator(
         color: Colors.blue,

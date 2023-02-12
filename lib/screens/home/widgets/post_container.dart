@@ -3,6 +3,7 @@ import 'package:fakebook_frontend/blocs/post/post_event.dart';
 import 'package:fakebook_frontend/constants/assets/placeholder.dart';
 import 'package:fakebook_frontend/routes.dart';
 import 'package:fakebook_frontend/screens/home/widgets/home_widgets.dart';
+import 'package:fakebook_frontend/screens/personal/personal_screen.dart';
 import 'package:fakebook_frontend/screens/watch/watch_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -42,6 +43,8 @@ class PostContainer extends StatelessWidget {
       if(event['action'] == 'navigateToDetailPost') {
         // print(post.id);
         Navigator.pushNamed(context, Routes.post_detail_screen, arguments: post.id);
+      } else if (event['action'] == 'navigateToPersonalScreen') {
+        Navigator.pushNamed(context, Routes.personal_screen, arguments: post.author.id);
       }
     }
     return Container(
@@ -55,7 +58,7 @@ class PostContainer extends StatelessWidget {
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                 _PostHeader(avtUrl: post.author.avatar, name: post.author.name, timeAgo: timeAgo, status: post.status),
+                 _PostHeader(avtUrl: post.author.avatar, name: post.author.name, timeAgo: timeAgo, status: post.status, onHandleOtherPostEvent: (event) => handleOtherPostEvent(event)),
                   const SizedBox(height: 4),
                   Text(post.described)
                 ]
@@ -106,35 +109,46 @@ class _PostHeader extends StatelessWidget {
   final String name;
   final String timeAgo;
   final String? status;
-  const _PostHeader({Key? key, required this.avtUrl, required this.name, required this.timeAgo, this.status}) : super(key: key);
+  final Function(Map event)? onHandleOtherPostEvent;
+  const _PostHeader({Key? key, required this.avtUrl, required this.name, required this.timeAgo, this.status, this.onHandleOtherPostEvent}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(0, 0, 8, 0),
-          child: CircleAvatar(
-            radius: 22.0,
-            backgroundImage: CachedNetworkImageProvider(avtUrl)
+        InkWell(
+          onTap: () {
+            onHandleOtherPostEvent?.call({'action': 'navigateToPersonalScreen'});
+          },
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(0, 0, 8, 0),
+            child: CircleAvatar(
+              radius: 22.0,
+              backgroundImage: CachedNetworkImageProvider(avtUrl)
+            ),
           ),
         ),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              RichText(
-                  text: TextSpan(
-                    style: DefaultTextStyle.of(context).style,
-                    children: <TextSpan>[
-                      TextSpan(text: '$name ', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 18)),
-                      if(status != null) TextSpan(text: 'hiện đang cảm thấy ',  style: TextStyle(color: Colors.black, fontSize: 16)),
-                      if(status != null) TextSpan(text: '$status', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 18)),
-                    ],
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis
+              InkWell(
+                onTap: () {
+                  onHandleOtherPostEvent?.call({'action': 'navigateToPersonalScreen'});
+                },
+                child: RichText(
+                    text: TextSpan(
+                      style: DefaultTextStyle.of(context).style,
+                      children: <TextSpan>[
+                        TextSpan(text: '$name ', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 18)),
+                        if(status != null) TextSpan(text: 'hiện đang cảm thấy ',  style: TextStyle(color: Colors.black, fontSize: 16)),
+                        if(status != null) TextSpan(text: '$status', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 18)),
+                      ],
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis
+                ),
               ),
               Row(
                 children: [
