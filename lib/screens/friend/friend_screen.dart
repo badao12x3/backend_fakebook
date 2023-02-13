@@ -71,10 +71,10 @@ class _FriendScreenContent extends State<FriendScreenContent> {
                               backgroundColor: MaterialStateProperty.all<Color>(
                                   Colors.grey.shade300),
                               shape: MaterialStateProperty.all<
-                                  RoundedRectangleBorder>(
+                                      RoundedRectangleBorder>(
                                   RoundedRectangleBorder(
                                       borderRadius:
-                                      BorderRadius.circular(18.0)))),
+                                          BorderRadius.circular(18.0)))),
                           onPressed: () {},
                           child: Text('Gợi ý'),
                         )),
@@ -87,10 +87,10 @@ class _FriendScreenContent extends State<FriendScreenContent> {
                               backgroundColor: MaterialStateProperty.all<Color>(
                                   Colors.grey.shade300),
                               shape: MaterialStateProperty.all<
-                                  RoundedRectangleBorder>(
+                                      RoundedRectangleBorder>(
                                   RoundedRectangleBorder(
                                       borderRadius:
-                                      BorderRadius.circular(18.0)))),
+                                          BorderRadius.circular(18.0)))),
                           onPressed: () {},
                           child: Text('Tất cả bạn bè'),
                         )),
@@ -132,12 +132,12 @@ class NumberOfFriendRequests extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<RequestReceivedFriendBloc, RequestReceivedFriendState>(
         builder: (context, state) {
-          final friendRequestReceivedList = state.friendRequestReceivedList;
-          return Text(
-              friendRequestReceivedList.requestReceivedFriendList.length.toString(),
-              style: TextStyle(
-                  fontSize: 20, fontWeight: FontWeight.bold, color: Colors.red));
-        });
+      final friendRequestReceivedList = state.friendRequestReceivedList;
+      return Text(
+          friendRequestReceivedList.requestReceivedFriendList.length.toString(),
+          style: TextStyle(
+              fontSize: 20, fontWeight: FontWeight.bold, color: Colors.red));
+    });
   }
 }
 
@@ -152,7 +152,7 @@ class FriendRequests extends StatelessWidget {
     DateTime dt2 = DateTime.parse(requestReceivedFriend.createdAt);
     final Duration diff = dt1.difference(dt2);
     final String timeAgo =
-    diff.inDays == 0 ? "${diff.inHours}h" : "${diff.inDays}d";
+        diff.inDays == 0 ? "${diff.inHours}h" : "${diff.inDays}d";
     return Container(
       color: Colors.white,
       child: Column(
@@ -160,10 +160,11 @@ class FriendRequests extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             child:
-            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Padding(
                   padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
                   child: RequestContainer(
+                      fromUser: requestReceivedFriend.fromUser,
                       name: requestReceivedFriend.name,
                       avtUrl: requestReceivedFriend.avatar,
                       timeAgo: timeAgo)),
@@ -180,20 +181,19 @@ class FriendRequest extends State<FriendRequestList> {
   Widget build(BuildContext context) {
     return BlocBuilder<RequestReceivedFriendBloc, RequestReceivedFriendState>(
         builder: (context, state) {
-          final friendRequestReceivedList = state.friendRequestReceivedList;
-
-          return SliverList(
-              delegate: SliverChildBuilderDelegate((context, index) {
-                return index >=
-                    friendRequestReceivedList.requestReceivedFriendList.length
-                    ? const BottomLoader()
-                    : FriendRequests(
-                    requestReceivedFriend: friendRequestReceivedList
-                        .requestReceivedFriendList[index] as RequestReceivedFriend);
-              },
-                  childCount:
+      final friendRequestReceivedList = state.friendRequestReceivedList;
+      return SliverList(
+          delegate: SliverChildBuilderDelegate((context, index) {
+        return index >=
+                friendRequestReceivedList.requestReceivedFriendList.length
+            ? const BottomLoader()
+            : FriendRequests(
+                requestReceivedFriend: friendRequestReceivedList
+                    .requestReceivedFriendList[index] as RequestReceivedFriend);
+      },
+              childCount:
                   friendRequestReceivedList.requestReceivedFriendList.length));
-        });
+    });
   }
 }
 

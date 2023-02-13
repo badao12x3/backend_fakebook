@@ -25,6 +25,16 @@ class RequestReceivedFriendBloc
       _onRequestReceivedFriendFetched,
       transformer: throttleDroppable(throttleDuration),
     );
+
+    on<RequestReceivedFriendAccept>(
+      _onRequestReceivedFriendAccept,
+      transformer: throttleDroppable(throttleDuration),
+    );
+
+    on<RequestReceivedFriendDelete>(
+      _onRequestReceivedFriendDelete,
+      transformer: throttleDroppable(throttleDuration),
+    );
   }
 
   Future<void> _onRequestReceivedFriendFetched(
@@ -33,12 +43,42 @@ class RequestReceivedFriendBloc
     try {
       final friendRequestReceivedListData =
           await friendRequestReceivedRepository.fetchRequestReceivedFriends();
-      if (!friendRequestReceivedListData.requestReceivedFriendList.isEmpty) {
-        state.friendRequestReceivedList.requestReceivedFriendList =
-            friendRequestReceivedListData.requestReceivedFriendList;
-        emit(state.copyWith(
-            requestReceivedFriendList: state.friendRequestReceivedList));
-      }
+      state.friendRequestReceivedList.requestReceivedFriendList =
+          friendRequestReceivedListData.requestReceivedFriendList;
+      emit(state.copyWith(
+          requestReceivedFriendList: state.friendRequestReceivedList));
+    } catch (_) {
+      emit(state.copyWith());
+    }
+  }
+
+  Future<void> _onRequestReceivedFriendAccept(RequestReceivedFriendAccept event,
+      Emitter<RequestReceivedFriendState> emit) async {
+    try {
+      final String fromUser = event.fromUser;
+      final friendRequestReceivedListData =
+          await friendRequestReceivedRepository
+              .acceptRequestReceivedFriends(fromUser);
+      state.friendRequestReceivedList.requestReceivedFriendList =
+          friendRequestReceivedListData.requestReceivedFriendList;
+      emit(state.copyWith(
+          requestReceivedFriendList: state.friendRequestReceivedList));
+    } catch (_) {
+      emit(state.copyWith());
+    }
+  }
+
+  Future<void> _onRequestReceivedFriendDelete(RequestReceivedFriendDelete event,
+      Emitter<RequestReceivedFriendState> emit) async {
+    try {
+      final String fromUser = event.fromUser;
+      final friendRequestReceivedListData =
+          await friendRequestReceivedRepository
+              .deleteRequestReceivedFriends(fromUser);
+      state.friendRequestReceivedList.requestReceivedFriendList =
+          friendRequestReceivedListData.requestReceivedFriendList;
+      emit(state.copyWith(
+          requestReceivedFriendList: state.friendRequestReceivedList));
     } catch (_) {
       emit(state.copyWith());
     }

@@ -6,3 +6,13 @@ abstract class RequestReceivedFriendEvent extends Equatable {
 }
 
 class RequestReceivedFriendFetched extends RequestReceivedFriendEvent {}
+
+class RequestReceivedFriendAccept extends RequestReceivedFriendEvent {
+  final String fromUser;
+  RequestReceivedFriendAccept({required this.fromUser});
+}
+
+class RequestReceivedFriendDelete extends RequestReceivedFriendEvent {
+  final String fromUser;
+  RequestReceivedFriendDelete({required this.fromUser});
+}
