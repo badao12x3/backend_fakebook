@@ -119,7 +119,7 @@ class PostDetailContent extends StatelessWidget {
                     ),
                     // CommentList(),
                     Expanded(child: CommentList()),
-                    SendComment()
+                    SendComment(postId: post.id)
                   ],
                 ),
               );
@@ -441,7 +441,8 @@ class CommentContainer extends StatelessWidget {
 }
 
 class SendComment extends StatefulWidget {
-  const SendComment({Key? key}) : super(key: key);
+  final String postId;
+  const SendComment({Key? key, required this.postId}) : super(key: key);
 
   @override
   State<SendComment> createState() => _SendCommentState();
@@ -576,6 +577,8 @@ class _SendCommentState extends State<SendComment> {
                   width: 32.0,
                   child: IconButton(
                       onPressed: (){
+                        final comment = _sendMessageController.text;
+                        BlocProvider.of<CommentBloc>(context).add(CommentSet(postId: widget.postId, comment: comment));
                         _sendMessageController.clear();
                         myFocusNode.unfocus();
                       },

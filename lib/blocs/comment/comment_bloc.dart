@@ -12,6 +12,7 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
     commentRepository = CommentRepository();
 
     on<CommentFetched>(_onCommentFetched);
+    on<CommentSet>(_onCommentSet);
   }
 
   Future<void> _onCommentFetched(CommentFetched event, Emitter<CommentState> emit) async {
@@ -21,6 +22,23 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
       final List<Comment>? comments = await commentRepository.fetchComments(postId: postId);
       if (comments != null) {
         emit(CommentState(commentStatus: CommentStatus.success, comments: comments));
+      }
+    } catch(error) {
+      emit(state.copyWith(commentStatus: CommentStatus.failure));
+    }
+  }
+
+  Future<void> _onCommentSet(CommentSet event, Emitter<CommentState> emit) async {
+    final postId = event.postId;
+    final comment = event.comment;
+    emit(state.copyWith(commentStatus: CommentStatus.loading));
+    try {
+      final List<Comment>? comments = await commentRepository.setComment(postId: postId, comment: comment);
+      if (comments != null) {
+        emit(CommentState(commentStatus: CommentStatus.success, comments: comments));
+      } else {
+        // để tạm, gửi comment hỏng nhưng vẫn giữ lại các comment khác
+        emit(state.copyWith(commentStatus: CommentStatus.success));
       }
     } catch(error) {
       emit(state.copyWith(commentStatus: CommentStatus.failure));

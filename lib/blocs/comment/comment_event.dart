@@ -15,7 +15,7 @@ class CommentFetched extends CommentEvent {
 
 class CommentSet extends CommentEvent {
   final String postId;
-  final Comment comment;
+  final String comment;
 
   CommentSet({required this.postId, required this.comment});
 }
