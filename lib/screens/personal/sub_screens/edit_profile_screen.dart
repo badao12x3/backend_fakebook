@@ -29,101 +29,101 @@ class EditProfileScreen extends StatelessWidget {
       body: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(
-              child: Container(
-            padding: EdgeInsets.all(20.0),
-            color: Colors.white,
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                        child: Text(
-                      "Ảnh đại diện",
-                      style: TextStyle(
-                          fontSize: 22.0, fontWeight: FontWeight.bold),
-                    )),
-                    GestureDetector(
-                      onTap: () {
-                        showModalBottomSheet(
-                            context: context,
-                            builder: (context) => AvatarBottomSheet());
-                      },
-                      child: Text(
-                        "Chỉnh sửa",
+            child: Container(
+              padding: EdgeInsets.all(20.0),
+              color: Colors.white,
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                          child: Text(
+                        "Ảnh đại diện",
                         style: TextStyle(
-                            fontSize: 17.0, color: Palette.facebookBlue),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20.0),
-                GestureDetector(
-                  onTap: () {
-                    showModalBottomSheet(
-                        context: context,
-                        builder: (context) => AvatarBottomSheet());
-                  },
-                  child: CircleAvatar(
-                    radius: 80.0,
-                    backgroundImage:
-                        CachedNetworkImageProvider(currentUser.imageUrl),
-                  ),
-                ),
-                const SizedBox(height: 20.0),
-                const Divider(
-                  height: 0.0,
-                  thickness: 1.0,
-                ),
-                const SizedBox(height: 20.0),
-                Row(
-                  children: [
-                    Expanded(
+                            fontSize: 22.0, fontWeight: FontWeight.bold),
+                      )),
+                      GestureDetector(
+                        onTap: () {
+                          showModalBottomSheet(
+                              context: context,
+                              builder: (context) => AvatarBottomSheet());
+                        },
                         child: Text(
-                      "Ảnh bìa",
-                      style: TextStyle(
-                          fontSize: 22.0, fontWeight: FontWeight.bold),
-                    )),
-                    GestureDetector(
-                      onTap: () {
-                        showModalBottomSheet(
-                            context: context,
-                            builder: (context) => CoverBottomSheet());
-                      },
-                      child: Text(
-                        "Chỉnh sửa",
-                        style: TextStyle(
-                            fontSize: 17.0, color: Palette.facebookBlue),
+                          "Chỉnh sửa",
+                          style: TextStyle(
+                              fontSize: 17.0, color: Palette.facebookBlue),
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20.0),
-                GestureDetector(
-                  onTap: () {
-                    showModalBottomSheet(
-                        context: context,
-                        builder: (context) => CoverBottomSheet());
-                  },
-                  child: Container(
-                    width: double.infinity,
-                    height: 220.0,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10.0),
-                        image: DecorationImage(
-                          image:
-                              CachedNetworkImageProvider(currentUser.imageUrl),
-                          fit: BoxFit.cover,
-                        )),
+                    ],
                   ),
-                ),
-                const SizedBox(height: 20.0),
-                const Divider(
-                  height: 0.0,
-                  thickness: 1.0,
-                ),
-                const SizedBox(height: 20.0),
-              ],
-            ),
+                  const SizedBox(height: 20.0),
+                  GestureDetector(
+                    onTap: () {
+                      showModalBottomSheet(
+                          context: context,
+                          builder: (context) => AvatarBottomSheet());
+                    },
+                    child: CircleAvatar(
+                      radius: 80.0,
+                      backgroundImage:
+                          CachedNetworkImageProvider(currentUser.imageUrl),
+                    ),
+                  ),
+                  const SizedBox(height: 20.0),
+                  const Divider(
+                    height: 0.0,
+                    thickness: 1.0,
+                  ),
+                  const SizedBox(height: 20.0),
+                  Row(
+                    children: [
+                      Expanded(
+                          child: Text(
+                        "Ảnh bìa",
+                        style: TextStyle(
+                            fontSize: 22.0, fontWeight: FontWeight.bold),
+                      )),
+                      GestureDetector(
+                        onTap: () {
+                          showModalBottomSheet(
+                              context: context,
+                              builder: (context) => CoverBottomSheet());
+                        },
+                        child: Text(
+                          "Chỉnh sửa",
+                          style: TextStyle(
+                              fontSize: 17.0, color: Palette.facebookBlue),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20.0),
+                  GestureDetector(
+                    onTap: () {
+                      showModalBottomSheet(
+                          context: context,
+                          builder: (context) => CoverBottomSheet());
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      height: 220.0,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10.0),
+                          image: DecorationImage(
+                            image:
+                                CachedNetworkImageProvider(currentUser.imageUrl),
+                            fit: BoxFit.cover,
+                          )),
+                    ),
+                  ),
+                  const SizedBox(height: 20.0),
+                  const Divider(
+                    height: 0.0,
+                    thickness: 1.0,
+                  ),
+                  const SizedBox(height: 20.0),
+                ],
+              ),
           )),
         ],
       ),
