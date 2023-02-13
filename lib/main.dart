@@ -72,7 +72,7 @@ class MyApp extends StatelessWidget {
             builder: (context, state) {
               switch (state.status) {
                 case AuthStatus.unknown:
-                  return LoginScreen();
+                  return LoginScreen(); //TODO: Nhớ sửa về LoginScreen()
                 case AuthStatus.unauthenticated:
                   return LoginScreen();
                 case AuthStatus.authenticated:
