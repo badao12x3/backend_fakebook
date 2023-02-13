@@ -358,7 +358,7 @@ class OptionContainerBottomSheet extends StatelessWidget {
                     backgroundColor: MaterialStateProperty.all<Color>(Colors.redAccent)
                 ),
                 onPressed: () {
-                  print(postId);
+                  BlocProvider.of<PostBloc>(context).add(PostDelete(postId: postId));
                   Navigator.pop(context);
                 },
                 child: Text('Xác nhận',
@@ -575,7 +575,7 @@ class _ReportPostBottomSheetState extends State<ReportPostBottomSheet> {
                   textStyle: const TextStyle(fontSize: 20),
                 ),
                 onPressed: () {
-                  print(subject);
+                  BlocProvider.of<PostBloc>(context).add(PostReport(postId: widget.postId, subject: subject, details: details));
                   Navigator.pop(context);
                 },
                 child: const Text('Gửi'),
