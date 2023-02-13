@@ -60,8 +60,7 @@ class PostDetailContent extends StatelessWidget {
               final Duration diff = dt1.difference(dt2);
               final String timeAgo = diff.inDays == 0 ? "${diff.inHours}h" : "${diff.inDays}d";
               return Container(
-                margin: const EdgeInsets.symmetric(vertical: 6),
-                padding: const EdgeInsets.symmetric(vertical: 8),
+                padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
                 color: Colors.white,
                 child: Column(
                   children: [
@@ -119,7 +118,8 @@ class PostDetailContent extends StatelessWidget {
                       ),
                     ),
                     // CommentList(),
-                    Expanded(child: CommentList())
+                    Expanded(child: CommentList()),
+                    SendComment()
                   ],
                 ),
               );
@@ -270,6 +270,11 @@ class _PostDetailStats extends StatelessWidget {
               ),
             )
           ],
+        ),
+        Material(
+          elevation: 0.25,
+          color: Colors.grey,
+          child: Container(height: 0.25)
         )
       ],
     );
@@ -435,3 +440,154 @@ class CommentContainer extends StatelessWidget {
   }
 }
 
+class SendComment extends StatefulWidget {
+  const SendComment({Key? key}) : super(key: key);
+
+  @override
+  State<SendComment> createState() => _SendCommentState();
+}
+
+class _SendCommentState extends State<SendComment> {
+  late TextEditingController _sendMessageController;
+  bool isTextSend = false;
+  late FocusNode myFocusNode;
+  late bool isMinimize;
+
+  @override
+  void initState() {
+    super.initState();
+    _sendMessageController = new TextEditingController();
+    myFocusNode = FocusNode();
+    myFocusNode.addListener(() {
+      // print("Focus: ${myFocusNode.hasFocus.toString()}");
+      if(myFocusNode.hasFocus) {
+        setState(() {
+          isMinimize = true;
+        });
+      }else{
+        setState(() {
+          isMinimize = false;
+        });
+      }
+    });
+    isMinimize = myFocusNode.hasFocus;
+  }
+
+  @override
+  void dispose() {
+    myFocusNode.dispose();
+    _sendMessageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      // height: 80,
+      // width: double.infinity,
+      constraints: BoxConstraints(
+          minHeight: 60,
+          minWidth: double.maxFinite,
+          maxHeight: 160),
+      decoration: BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.5),
+              spreadRadius: 2,
+              blurRadius: 4,
+              offset: Offset(0, 3), // changes position of shadow
+            ),
+          ],
+          color: Colors.white
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(10),
+        child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: _sendMessageController.text.length <= 20 ? CrossAxisAlignment.center : CrossAxisAlignment.end,
+              children: <Widget>[
+                isMinimize ?
+                GestureDetector(
+                  child: Icon(Icons.arrow_forward_ios, size: 35, color: Colors.blue),
+                  onTap: () {
+                    setState(() {
+                      isMinimize = false;
+                    });
+                  },
+                ) :
+                Container(
+                  child: Row(
+                    children: const <Widget>[
+                      Icon(Icons.add_circle, size: 35,color: Colors.blue),
+                      SizedBox(width: 5),
+                      Icon(Icons.camera_alt,size: 35,color: Colors.blue),
+                      SizedBox(width: 5),
+                      Icon(Icons.photo,size: 35,color: Colors.blue)
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.only(left: 12), //for TextField
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.all(
+                          Radius.circular(12.0) //                 <--- border radius here
+                      ),
+                      color: Colors.white,
+                    ),
+                    child: TextField(
+                      keyboardType: TextInputType.multiline,
+                      maxLines: null,
+                      cursorColor: Colors.grey,
+                      autofocus: false,
+                      decoration: InputDecoration(
+                        hintText: 'Viết bình luận của bạn',
+                        focusedBorder: InputBorder.none,
+                        enabledBorder: InputBorder.none
+                      ),
+                      focusNode: myFocusNode,
+                      controller: _sendMessageController,
+                      onChanged: (text) {
+                        if(text.length == 0) {
+                          setState(() {
+                            isTextSend = false;
+                          });
+                        }else{
+                          setState(() {
+                            isTextSend = true;
+                            isMinimize = true;
+                          });
+                        }
+                      },
+                      onTap: (){
+                        setState(() {
+                          isMinimize = true;
+                        });
+                      }
+                    ),
+                  ),
+                ),
+                SizedBox(width: 12),
+                isTextSend ?
+                SizedBox(
+                  height: 32.0,
+                  width: 32.0,
+                  child: IconButton(
+                      onPressed: (){
+                        _sendMessageController.clear();
+                        myFocusNode.unfocus();
+                      },
+                      iconSize: 32,
+                      padding: EdgeInsets.all(0),
+                      icon: const Icon(Icons.send,color: Colors.blue)
+                  ),
+                ) :
+                const Icon(Icons.sms,size: 32,color: Colors.blue),
+              ],
+            )
+      ),
+    );
+  }
+}
