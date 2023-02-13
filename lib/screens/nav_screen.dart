@@ -4,10 +4,13 @@ import 'package:fakebook_frontend/constants/assets/palette.dart';
 import 'package:fakebook_frontend/screens/friend/friend_screen.dart';
 import 'package:fakebook_frontend/screens/home/home_screen.dart';
 import 'package:fakebook_frontend/screens/menu/menu_screen.dart';
+import 'package:fakebook_frontend/screens/notification/noti_screen.dart';
 import 'package:fakebook_frontend/screens/personal/personal_screen.dart';
 import 'package:fakebook_frontend/screens/watch/watch_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'notification/widgets/noti_container.dart';
 
 class NavScreen extends StatefulWidget {
   const NavScreen({Key? key}) : super(key: key);
@@ -20,16 +23,19 @@ class NavScreen extends StatefulWidget {
 class _NavScreenState extends State<NavScreen> with TickerProviderStateMixin{
   late TabController _tabController;
   static final List<IconData> _icons = const [
-    Icons.home, Icons.people, Icons.ondemand_video, Icons.account_circle, Icons.notifications, Icons.menu
+    Icons.home,
+    Icons.people,
+    Icons.ondemand_video,
+    Icons.account_circle,
+    Icons.notifications,
+    Icons.menu
   ];
   static final List<Widget> _screens = [
     HomeScreen(),
     FriendScreen(),
     WatchTab(),
     PersonalScreen(),
-    Center(
-      child: Text("It's not rainy here"),
-    ),
+    NotificationScreen(),
     MenuScreen(),
   ];
 
