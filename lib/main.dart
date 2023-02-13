@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:bloc/bloc.dart';
+import 'package:fakebook_frontend/blocs/comment/comment_bloc.dart';
 import 'package:fakebook_frontend/blocs/personal_post/personal_post_bloc.dart';
 import 'package:fakebook_frontend/blocs/post_detail/post_detail_bloc.dart';
 import 'package:fakebook_frontend/repositories/post_repository.dart';
@@ -53,6 +54,10 @@ class MyApp extends StatelessWidget {
         BlocProvider<PersonalPostBloc>(
           lazy: false,
           create: (_) => PersonalPostBloc(postRepository: postRepository)
+        ),
+        BlocProvider<CommentBloc>(
+          lazy: false,
+          create: (_) => CommentBloc(),
         )
       ],
       child: MaterialApp(

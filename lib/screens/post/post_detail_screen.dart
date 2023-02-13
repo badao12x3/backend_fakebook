@@ -1,13 +1,17 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:fakebook_frontend/blocs/comment/comment_event.dart';
+import 'package:fakebook_frontend/blocs/comment/comment_state.dart';
 import 'package:fakebook_frontend/blocs/post_detail/post_detail_bloc.dart';
 import 'package:fakebook_frontend/blocs/post_detail/post_detail_event.dart';
 import 'package:fakebook_frontend/blocs/post_detail/post_detail_state.dart';
 import 'package:fakebook_frontend/constants/assets/palette.dart';
+import 'package:fakebook_frontend/models/comment_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
+import '../../blocs/comment/comment_bloc.dart';
 import '../../constants/assets/placeholder.dart';
 import '../../repositories/post_repository.dart';
 
@@ -21,15 +25,14 @@ class PostDetailScreen extends StatelessWidget {
     // final String postId = ModalRoute.of(context)?.settings.arguments as String;
     // print("#PostDetailScreen: " + postId);
     BlocProvider.of<PostDetailBloc>(context).add(PostDetailFetched(postId: postId));
+    BlocProvider.of<CommentBloc>(context).add(CommentFetched(postId: postId));
     return Scaffold(
         backgroundColor: Colors.white,
         body: SafeArea(
-          child: SingleChildScrollView(
+          // child: SingleChildScrollView(
             child: PostDetailContent(),
-          ),
+          // ),
         )
-
-      // child: PostDetailContent(),
     );
   }
 }
@@ -49,7 +52,7 @@ class PostDetailContent extends StatelessWidget {
             case PostDetailStatus.loading:
               return Center(child: CircularProgressIndicator());
             case PostDetailStatus.failure:
-              return Center(child: Text('Failed to fetch posts'));
+              return Center(child: Text('Failed to fetch detail post'));
             case PostDetailStatus.success: {
               final post = state.postDetail!;
               DateTime dt1 = DateTime.now();
@@ -67,7 +70,7 @@ class PostDetailContent extends StatelessWidget {
                       child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _PostDetailHeader(avtUrl: post.author.avatar, name: post.author.name, timeAgo: timeAgo),
+                            _PostDetailHeader(avtUrl: post.author.avatar, name: post.author.name, timeAgo: timeAgo, status: post.status),
                             const SizedBox(height: 4),
                             Text(post.described)
                           ]
@@ -114,7 +117,9 @@ class PostDetailContent extends StatelessWidget {
 
                           }
                       ),
-                    )
+                    ),
+                    // CommentList(),
+                    Expanded(child: CommentList())
                   ],
                 ),
               );
@@ -130,7 +135,8 @@ class _PostDetailHeader extends StatelessWidget {
   final String avtUrl;
   final String name;
   final String timeAgo;
-  const _PostDetailHeader({Key? key, required this.avtUrl, required this.name, required this.timeAgo}) : super(key: key);
+  final String? status;
+  const _PostDetailHeader({Key? key, required this.avtUrl, required this.name, required this.timeAgo, this.status}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -156,7 +162,18 @@ class _PostDetailHeader extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(name, style: const TextStyle(fontWeight: FontWeight.w600)),
+              RichText(
+                  text: TextSpan(
+                    style: DefaultTextStyle.of(context).style,
+                    children: <TextSpan>[
+                      TextSpan(text: '$name ', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 18)),
+                      if(status != null) TextSpan(text: 'hiện đang cảm thấy ',  style: TextStyle(color: Colors.black, fontSize: 16)),
+                      if(status != null) TextSpan(text: '$status', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 18)),
+                    ],
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis
+              ),
               Row(
                 children: [
                   Text('$timeAgo \u00B7 ', style: TextStyle(color: Colors.grey[600], fontSize: 12)),
@@ -330,4 +347,91 @@ class _PostDetailVideoContainerState extends State<PostDetailVideoContainer> {
   }
 }
 
+class CommentList extends StatefulWidget {
+  const CommentList({Key? key}) : super(key: key);
+
+  @override
+  State<CommentList> createState() => _CommentListState();
+}
+
+class _CommentListState extends State<CommentList> {
+
+  @override
+  Widget build(BuildContext context) {
+   return BlocBuilder<CommentBloc, CommentState>(
+       builder: (context, state) {
+         switch (state.commentStatus) {
+           case CommentStatus.initial:
+             return Center(child: CircularProgressIndicator());
+           case CommentStatus.loading:
+             return Center(child: CircularProgressIndicator());
+           case CommentStatus.failure:
+             return Center(child: Text('Failed to fetch comments'));
+           case CommentStatus.success: {
+             final List<Comment> comments = state.comments ?? <Comment>[];
+             return ListView.builder(
+               // primary: false,
+               // shrinkWrap: true,
+               // physics: NeverScrollableScrollPhysics(),
+                 padding: const EdgeInsets.all(8),
+                 itemCount: comments.length,
+                 itemBuilder: (BuildContext context, int index) {
+                   final Comment comment = comments[index];
+                   return CommentContainer(avtUrl: comment.poster.avatar, name: comment.poster.name, comment: comment.comment, createdAt: comment.createdAt);
+                 }
+             );
+           }
+         }
+       }
+   );
+  }
+
+}
+
+class CommentContainer extends StatelessWidget {
+  final String avtUrl;
+  final String name;
+  final String comment;
+  final String createdAt;
+
+  CommentContainer({Key? key, required this.avtUrl, required this.name, required this.comment, required this.createdAt}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    DateTime dt1 = DateTime.now();
+    DateTime dt2 = DateTime.parse(createdAt);
+    final Duration diff = dt1.difference(dt2);
+    final String timeAgo = diff.inDays == 0 ? "${diff.inHours} giờ" : "${diff.inDays} ngày";
+    return Container(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(0, 0, 8, 0),
+            child: CircleAvatar(
+                radius: 22.0,
+                backgroundImage: CachedNetworkImageProvider(avtUrl)
+            ),
+          ),
+          Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(name, style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold ,fontSize: 18)),
+                  SizedBox(height: 4),
+                  Text(comment, style: TextStyle(color: Colors.black, overflow: TextOverflow.clip)),
+                  SizedBox(height: 4),
+                  Text(timeAgo, style: TextStyle(color: Colors.blue, fontStyle: FontStyle.italic, overflow: TextOverflow.clip)),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Divider(height: 4, thickness: 1),
+                  )
+                ],
+              )
+          )
+        ]
+      )
+    );
+  }
+}
 
