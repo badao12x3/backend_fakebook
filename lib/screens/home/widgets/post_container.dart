@@ -3,6 +3,7 @@ import 'package:fakebook_frontend/blocs/post/post_event.dart';
 import 'package:fakebook_frontend/constants/assets/placeholder.dart';
 import 'package:fakebook_frontend/routes.dart';
 import 'package:fakebook_frontend/screens/home/widgets/home_widgets.dart';
+import 'package:fakebook_frontend/screens/personal/personal_screen.dart';
 import 'package:fakebook_frontend/screens/watch/watch_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -12,6 +13,9 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import 'package:fakebook_frontend/constants/assets/palette.dart';
 import 'package:fakebook_frontend/models/models.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+
+import '../../../blocs/personal_post/personal_post_bloc.dart';
+import '../../../blocs/personal_post/personal_post_event.dart';
 
 class PostContainer extends StatelessWidget {
   final Post post;
@@ -29,13 +33,18 @@ class PostContainer extends StatelessWidget {
 
     void handleLikePost() {
       // print("#PostContainer: Like post: ${post.id}");
+      // Bị vấn đề là dùng chung PostContainer và khi state của 1 trong 2 cái chưa load hết mà update thì sẽ khả năng lỗi mảng cao
+      // Đã sửa bằng cách fix if(indexOfMustUpdatePost == -1) return; ---> nhưng chỉ update được 1 trong 2 cái, 1 cái còn lại luôn báo lỗi không thấy mảng -1 dù cả 2 đã load hết state ---> Tạm chấp nhận được
       BlocProvider.of<PostBloc>(context).add(PostLike(post: post));
+      BlocProvider.of<PersonalPostBloc>(context).add(PersonalPostLike(post: post));
     }
 
     void handleOtherPostEvent(Map event) {
       if(event['action'] == 'navigateToDetailPost') {
         // print(post.id);
         Navigator.pushNamed(context, Routes.post_detail_screen, arguments: post.id);
+      } else if (event['action'] == 'navigateToPersonalScreen') {
+        Navigator.pushNamed(context, Routes.personal_screen, arguments: post.author.id);
       }
     }
     return Container(
@@ -49,7 +58,7 @@ class PostContainer extends StatelessWidget {
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                 _PostHeader(avtUrl: post.author.avatar, name: post.author.name, timeAgo: timeAgo),
+                 _PostHeader(avtUrl: post.author.avatar, name: post.author.name, timeAgo: timeAgo, status: post.status, onHandleOtherPostEvent: (event) => handleOtherPostEvent(event)),
                   const SizedBox(height: 4),
                   Text(post.described)
                 ]
@@ -99,25 +108,48 @@ class _PostHeader extends StatelessWidget {
   final String avtUrl;
   final String name;
   final String timeAgo;
-  const _PostHeader({Key? key, required this.avtUrl, required this.name, required this.timeAgo}) : super(key: key);
+  final String? status;
+  final Function(Map event)? onHandleOtherPostEvent;
+  const _PostHeader({Key? key, required this.avtUrl, required this.name, required this.timeAgo, this.status, this.onHandleOtherPostEvent}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(0, 0, 8, 0),
-          child: CircleAvatar(
-            radius: 22.0,
-            backgroundImage: CachedNetworkImageProvider(avtUrl)
+        InkWell(
+          onTap: () {
+            onHandleOtherPostEvent?.call({'action': 'navigateToPersonalScreen'});
+          },
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(0, 0, 8, 0),
+            child: CircleAvatar(
+              radius: 22.0,
+              backgroundImage: CachedNetworkImageProvider(avtUrl)
+            ),
           ),
         ),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(name, style: const TextStyle(fontWeight: FontWeight.w600)),
+              InkWell(
+                onTap: () {
+                  onHandleOtherPostEvent?.call({'action': 'navigateToPersonalScreen'});
+                },
+                child: RichText(
+                    text: TextSpan(
+                      style: DefaultTextStyle.of(context).style,
+                      children: <TextSpan>[
+                        TextSpan(text: '$name ', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 18)),
+                        if(status != null) TextSpan(text: 'hiện đang cảm thấy ',  style: TextStyle(color: Colors.black, fontSize: 16)),
+                        if(status != null) TextSpan(text: '$status', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 18)),
+                      ],
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis
+                ),
+              ),
               Row(
                 children: [
                   Text('$timeAgo \u00B7 ', style: TextStyle(color: Colors.grey[600], fontSize: 12)),

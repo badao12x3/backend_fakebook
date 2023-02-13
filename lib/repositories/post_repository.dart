@@ -8,6 +8,8 @@ import 'dart:convert';
 
 import 'package:fakebook_frontend/models/post_model.dart';
 import 'package:fakebook_frontend/configuration.dart';
+import 'package:http_parser/http_parser.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PostRepository {
@@ -144,5 +146,103 @@ class PostRepository {
       return null;
     }
   }
+
+  Future<PostList> fetchPostsByAccountId({required String accountId, int startIndex = 0, String? last_id}) async {
+    try {
+      // print("Fetching posts");
+      const postLimit = 5;
+      final url = last_id != null ? Uri.http(
+          Configuration.baseUrlConnect, '/post/get_list_posts/$accountId', {
+        'index': '$startIndex',
+        'count': '$postLimit',
+        'last_id': last_id
+      })
+          : Uri.http(Configuration.baseUrlConnect, '/post/get_list_posts/$accountId',
+          {'index': '$startIndex', 'count': '$postLimit'});
+
+      // get token from local storage/cache
+      var token = await Token.getToken();
+      // print("#Post_repository: " +  token.toString());
+
+      final response = await http.get(url, headers: {
+        HttpHeaders.authorizationHeader: token,
+      });
+      if (response.statusCode == 200) {
+        final body = json.decode(response.body) as Map<String, dynamic>;
+        final postList = PostList.fromJson(body);
+        return postList;
+      } else if (response.statusCode == 400) {
+        return PostList.initial();
+      } else {
+        return PostList.initial();
+      }
+    } catch(error) {
+      throw Exception('Error fetching personal posts');
+    }
+
+  }
+
+  Future<PostDetail?> addPost({required String described, String? status, List<XFile>? imageFileList}) async {
+    try {
+      var token = await Token.getToken();
+      final url = Uri.http(Configuration.baseUrlConnect, 'post/add_post');
+      List<File>? imageList;
+      if(imageFileList !=null) {
+        imageList = imageFileList.map((image) {
+          File file = File(image.path);
+          return file;
+        }).toList();
+      }
+
+      // cái này chỉ gửi được described và status, không gửi được ảnh
+      // final response = await http.post(url,
+      //     headers: <String, String>{
+      //       HttpHeaders.authorizationHeader: token,
+      //       'Content-Type': 'application/json; charset=UTF-8',
+      //     },
+      //     body: jsonEncode(<String, dynamic>{
+      //       'described': described,
+      //       if(status != null) 'status': status,
+      //       if(imageList != null && imageList.length == 1) 'image': imageList[0],
+      //       if(imageList != null && imageList.length == 2) 'image': imageList[1],
+      //       if(imageList != null && imageList.length == 3) 'image': imageList[2],
+      //       if(imageList != null && imageList.length == 4) 'image': imageList[3]
+      //     })
+      // );
+
+      var request = http.MultipartRequest("POST", url);
+      Map<String, String> headers = { HttpHeaders.authorizationHeader: token };
+      request.headers.addAll(headers);
+      request.fields["described"] = described;
+      if(status != null) request.fields["status"] = status;
+
+      if(imageList != null && imageList.length == 1) {
+        // print(imageList[0].path);
+        var ext = imageList[0].path.split('.').last;
+        var pic = await http.MultipartFile.fromPath("image", imageList[0].path, contentType: MediaType('image', ext));
+        request.files.add(pic);
+      }
+
+      var responseStreamedResponse = await request.send();
+      var responseData = await responseStreamedResponse.stream.toBytes();
+      // var responseString = String.fromCharCodes(responseData); // lỗi tiếng việt
+      // print("#PostRepository: $responseString");
+      var responseUTF8 = utf8.decode(responseData);
+      // print("#PostRepository: $responseUTF8");
+
+      if (responseStreamedResponse.statusCode == 201) {
+        final body = json.decode(responseUTF8) as Map<String, dynamic>;
+        final postDetail = PostDetail.fromJson(body['data']);
+        return postDetail;
+      } else if (responseStreamedResponse.statusCode == 400) {
+        return null;
+      } else {
+        return null;
+      }
+    } catch(error) {
+      throw Exception('${error} - Error to add post');
+    }
+  }
+
 
 }

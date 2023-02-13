@@ -2,8 +2,8 @@ import 'package:fakebook_frontend/constants/assets/palette.dart';
 import 'package:fakebook_frontend/screens/friend/friend_screen.dart';
 import 'package:fakebook_frontend/screens/home/home_screen.dart';
 import 'package:fakebook_frontend/screens/menu/menu_screen.dart';
+import 'package:fakebook_frontend/screens/personal/personal_screen.dart';
 import 'package:fakebook_frontend/screens/watch/watch_screen.dart';
-
 import 'package:flutter/material.dart';
 
 class NavScreen extends StatefulWidget {
@@ -23,14 +23,11 @@ class _NavScreenState extends State<NavScreen> with TickerProviderStateMixin{
     HomeScreen(),
     FriendScreen(),
     WatchTab(),
-    Center(
-      child: Text("It's not rainy here"),
-    ),
+    PersonalScreen(),
     Center(
       child: Text("It's not rainy here"),
     ),
     MenuScreen(),
-
   ];
 
   final List<Tab> _screenTabs = _icons.map((icon) => Tab(
@@ -54,6 +51,7 @@ class _NavScreenState extends State<NavScreen> with TickerProviderStateMixin{
     // final user = BlocProvider.of<AuthBloc>(context).state.authUser;
     // final token = user.token;
     // final userId = user.id;
+    // print("$token, $userId");
     return Scaffold(
       body: TabBarView(
         controller: _tabController,

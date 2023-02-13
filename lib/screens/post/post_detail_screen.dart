@@ -1,13 +1,17 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:fakebook_frontend/blocs/comment/comment_event.dart';
+import 'package:fakebook_frontend/blocs/comment/comment_state.dart';
 import 'package:fakebook_frontend/blocs/post_detail/post_detail_bloc.dart';
 import 'package:fakebook_frontend/blocs/post_detail/post_detail_event.dart';
 import 'package:fakebook_frontend/blocs/post_detail/post_detail_state.dart';
 import 'package:fakebook_frontend/constants/assets/palette.dart';
+import 'package:fakebook_frontend/models/comment_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
+import '../../blocs/comment/comment_bloc.dart';
 import '../../constants/assets/placeholder.dart';
 import '../../repositories/post_repository.dart';
 
@@ -19,17 +23,16 @@ class PostDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     // null. Hơi lạ
     // final String postId = ModalRoute.of(context)?.settings.arguments as String;
-    print("#PostDetailScreen: " + postId);
+    // print("#PostDetailScreen: " + postId);
     BlocProvider.of<PostDetailBloc>(context).add(PostDetailFetched(postId: postId));
+    BlocProvider.of<CommentBloc>(context).add(CommentFetched(postId: postId));
     return Scaffold(
         backgroundColor: Colors.white,
         body: SafeArea(
-          child: SingleChildScrollView(
+          // child: SingleChildScrollView(
             child: PostDetailContent(),
-          ),
+          // ),
         )
-
-      // child: PostDetailContent(),
     );
   }
 }
@@ -49,7 +52,7 @@ class PostDetailContent extends StatelessWidget {
             case PostDetailStatus.loading:
               return Center(child: CircularProgressIndicator());
             case PostDetailStatus.failure:
-              return Center(child: Text('Failed to fetch posts'));
+              return Center(child: Text('Failed to fetch detail post'));
             case PostDetailStatus.success: {
               final post = state.postDetail!;
               DateTime dt1 = DateTime.now();
@@ -57,8 +60,7 @@ class PostDetailContent extends StatelessWidget {
               final Duration diff = dt1.difference(dt2);
               final String timeAgo = diff.inDays == 0 ? "${diff.inHours}h" : "${diff.inDays}d";
               return Container(
-                margin: const EdgeInsets.symmetric(vertical: 6),
-                padding: const EdgeInsets.symmetric(vertical: 8),
+                padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
                 color: Colors.white,
                 child: Column(
                   children: [
@@ -67,7 +69,7 @@ class PostDetailContent extends StatelessWidget {
                       child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _PostDetailHeader(avtUrl: post.author.avatar, name: post.author.name, timeAgo: timeAgo),
+                            _PostDetailHeader(avtUrl: post.author.avatar, name: post.author.name, timeAgo: timeAgo, status: post.status),
                             const SizedBox(height: 4),
                             Text(post.described)
                           ]
@@ -114,7 +116,10 @@ class PostDetailContent extends StatelessWidget {
 
                           }
                       ),
-                    )
+                    ),
+                    // CommentList(),
+                    Expanded(child: CommentList()),
+                    SendComment(postId: post.id)
                   ],
                 ),
               );
@@ -130,7 +135,8 @@ class _PostDetailHeader extends StatelessWidget {
   final String avtUrl;
   final String name;
   final String timeAgo;
-  const _PostDetailHeader({Key? key, required this.avtUrl, required this.name, required this.timeAgo}) : super(key: key);
+  final String? status;
+  const _PostDetailHeader({Key? key, required this.avtUrl, required this.name, required this.timeAgo, this.status}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -156,7 +162,18 @@ class _PostDetailHeader extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(name, style: const TextStyle(fontWeight: FontWeight.w600)),
+              RichText(
+                  text: TextSpan(
+                    style: DefaultTextStyle.of(context).style,
+                    children: <TextSpan>[
+                      TextSpan(text: '$name ', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 18)),
+                      if(status != null) TextSpan(text: 'hiện đang cảm thấy ',  style: TextStyle(color: Colors.black, fontSize: 16)),
+                      if(status != null) TextSpan(text: '$status', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 18)),
+                    ],
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis
+              ),
               Row(
                 children: [
                   Text('$timeAgo \u00B7 ', style: TextStyle(color: Colors.grey[600], fontSize: 12)),
@@ -253,6 +270,11 @@ class _PostDetailStats extends StatelessWidget {
               ),
             )
           ],
+        ),
+        Material(
+          elevation: 0.25,
+          color: Colors.grey,
+          child: Container(height: 0.25)
         )
       ],
     );
@@ -330,4 +352,245 @@ class _PostDetailVideoContainerState extends State<PostDetailVideoContainer> {
   }
 }
 
+class CommentList extends StatefulWidget {
+  const CommentList({Key? key}) : super(key: key);
 
+  @override
+  State<CommentList> createState() => _CommentListState();
+}
+
+class _CommentListState extends State<CommentList> {
+
+  @override
+  Widget build(BuildContext context) {
+   return BlocBuilder<CommentBloc, CommentState>(
+       builder: (context, state) {
+         switch (state.commentStatus) {
+           case CommentStatus.initial:
+             return Center(child: CircularProgressIndicator());
+           case CommentStatus.loading:
+             return Center(child: CircularProgressIndicator());
+           case CommentStatus.failure:
+             return Center(child: Text('Failed to fetch comments'));
+           case CommentStatus.success: {
+             final List<Comment> comments = state.comments ?? <Comment>[];
+             return ListView.builder(
+               // primary: false,
+               // shrinkWrap: true,
+               // physics: NeverScrollableScrollPhysics(),
+                 padding: const EdgeInsets.all(8),
+                 itemCount: comments.length,
+                 itemBuilder: (BuildContext context, int index) {
+                   final Comment comment = comments[index];
+                   return CommentContainer(avtUrl: comment.poster.avatar, name: comment.poster.name, comment: comment.comment, createdAt: comment.createdAt);
+                 }
+             );
+           }
+         }
+       }
+   );
+  }
+
+}
+
+class CommentContainer extends StatelessWidget {
+  final String avtUrl;
+  final String name;
+  final String comment;
+  final String createdAt;
+
+  CommentContainer({Key? key, required this.avtUrl, required this.name, required this.comment, required this.createdAt}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    DateTime dt1 = DateTime.now();
+    DateTime dt2 = DateTime.parse(createdAt);
+    final Duration diff = dt1.difference(dt2);
+    final String timeAgo = diff.inDays == 0 ? "${diff.inHours} giờ" : "${diff.inDays} ngày";
+    return Container(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(0, 0, 8, 0),
+            child: CircleAvatar(
+                radius: 22.0,
+                backgroundImage: CachedNetworkImageProvider(avtUrl)
+            ),
+          ),
+          Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(name, style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold ,fontSize: 18)),
+                  SizedBox(height: 4),
+                  Text(comment, style: TextStyle(color: Colors.black, overflow: TextOverflow.clip)),
+                  SizedBox(height: 4),
+                  Text(timeAgo, style: TextStyle(color: Colors.blue, fontStyle: FontStyle.italic, overflow: TextOverflow.clip)),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Divider(height: 4, thickness: 1),
+                  )
+                ],
+              )
+          )
+        ]
+      )
+    );
+  }
+}
+
+class SendComment extends StatefulWidget {
+  final String postId;
+  const SendComment({Key? key, required this.postId}) : super(key: key);
+
+  @override
+  State<SendComment> createState() => _SendCommentState();
+}
+
+class _SendCommentState extends State<SendComment> {
+  late TextEditingController _sendMessageController;
+  bool isTextSend = false;
+  late FocusNode myFocusNode;
+  late bool isMinimize;
+
+  @override
+  void initState() {
+    super.initState();
+    _sendMessageController = new TextEditingController();
+    myFocusNode = FocusNode();
+    myFocusNode.addListener(() {
+      // print("Focus: ${myFocusNode.hasFocus.toString()}");
+      if(myFocusNode.hasFocus) {
+        setState(() {
+          isMinimize = true;
+        });
+      }else{
+        setState(() {
+          isMinimize = false;
+        });
+      }
+    });
+    isMinimize = myFocusNode.hasFocus;
+  }
+
+  @override
+  void dispose() {
+    myFocusNode.dispose();
+    _sendMessageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      // height: 80,
+      // width: double.infinity,
+      constraints: BoxConstraints(
+          minHeight: 60,
+          minWidth: double.maxFinite,
+          maxHeight: 160),
+      decoration: BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.5),
+              spreadRadius: 2,
+              blurRadius: 4,
+              offset: Offset(0, 3), // changes position of shadow
+            ),
+          ],
+          color: Colors.white
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(10),
+        child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: _sendMessageController.text.length <= 20 ? CrossAxisAlignment.center : CrossAxisAlignment.end,
+              children: <Widget>[
+                isMinimize ?
+                GestureDetector(
+                  child: Icon(Icons.arrow_forward_ios, size: 35, color: Colors.blue),
+                  onTap: () {
+                    setState(() {
+                      isMinimize = false;
+                    });
+                  },
+                ) :
+                Container(
+                  child: Row(
+                    children: const <Widget>[
+                      Icon(Icons.add_circle, size: 35,color: Colors.blue),
+                      SizedBox(width: 5),
+                      Icon(Icons.camera_alt,size: 35,color: Colors.blue),
+                      SizedBox(width: 5),
+                      Icon(Icons.photo,size: 35,color: Colors.blue)
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.only(left: 12), //for TextField
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.all(
+                          Radius.circular(12.0) //                 <--- border radius here
+                      ),
+                      color: Colors.white,
+                    ),
+                    child: TextField(
+                      keyboardType: TextInputType.multiline,
+                      maxLines: null,
+                      cursorColor: Colors.grey,
+                      autofocus: false,
+                      decoration: InputDecoration(
+                        hintText: 'Viết bình luận của bạn',
+                        focusedBorder: InputBorder.none,
+                        enabledBorder: InputBorder.none
+                      ),
+                      focusNode: myFocusNode,
+                      controller: _sendMessageController,
+                      onChanged: (text) {
+                        if(text.length == 0) {
+                          setState(() {
+                            isTextSend = false;
+                          });
+                        }else{
+                          setState(() {
+                            isTextSend = true;
+                            isMinimize = true;
+                          });
+                        }
+                      },
+                      onTap: (){
+                        setState(() {
+                          isMinimize = true;
+                        });
+                      }
+                    ),
+                  ),
+                ),
+                SizedBox(width: 12),
+                isTextSend ?
+                SizedBox(
+                  height: 32.0,
+                  width: 32.0,
+                  child: IconButton(
+                      onPressed: (){
+                        final comment = _sendMessageController.text;
+                        BlocProvider.of<CommentBloc>(context).add(CommentSet(postId: widget.postId, comment: comment));
+                        _sendMessageController.clear();
+                        myFocusNode.unfocus();
+                      },
+                      iconSize: 32,
+                      padding: EdgeInsets.all(0),
+                      icon: const Icon(Icons.send,color: Colors.blue)
+                  ),
+                ) :
+                const Icon(Icons.sms,size: 32,color: Colors.blue),
+              ],
+            )
+      ),
+    );
+  }
+}
