@@ -345,7 +345,7 @@ class ListFriendCompact extends StatelessWidget {
         itemBuilder: (context, index) {
           return index >= listFriend.listFriend.length
               ? const GridTile(
-                  child: Padding(padding: EdgeInsets.fromLTRB(200, 200, 0, 0)))
+                  child: Padding(padding: EdgeInsets.fromLTRB(150, 150, 0, 0)))
               : GridTile(
                   child: Friend(
                     friendName: listFriend.listFriend[index].name,

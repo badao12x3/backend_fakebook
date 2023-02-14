@@ -35,8 +35,8 @@ class _FriendScreenContent extends State<FriendScreenContent> {
   @override
   Widget build(BuildContext context) {
     print("#POST OBSERVER: Rebuild");
-    return Container(
-      child: CustomScrollView(
+    return Scaffold(
+      body: CustomScrollView(
         slivers: [
           SliverAppBar(
             leading: IconButton(
@@ -64,66 +64,61 @@ class _FriendScreenContent extends State<FriendScreenContent> {
               ),
             ],
           ),
-          SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
-            sliver: SliverToBoxAdapter(
+          SliverToBoxAdapter(
               child: Container(
                   color: Colors.white,
                   child: Row(children: [
-                    Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 0, 2, 0),
-                        child: OutlinedButton(
-                          style: ButtonStyle(
-                              foregroundColor: MaterialStateProperty.all<Color>(
-                                  Colors.black),
-                              backgroundColor: MaterialStateProperty.all<Color>(
-                                  Colors.grey.shade300),
-                              shape: MaterialStateProperty.all<
-                                      RoundedRectangleBorder>(
+                Padding(
+                    padding: const EdgeInsets.fromLTRB(12, 0, 2, 0),
+                    child: OutlinedButton(
+                      style: ButtonStyle(
+                          foregroundColor:
+                              MaterialStateProperty.all<Color>(Colors.black),
+                          backgroundColor: MaterialStateProperty.all<Color>(
+                              Colors.grey.shade300),
+                          shape:
+                              MaterialStateProperty.all<RoundedRectangleBorder>(
                                   RoundedRectangleBorder(
                                       borderRadius:
                                           BorderRadius.circular(18.0)))),
-                          onPressed: () {},
-                          child: Text('Gợi ý'),
-                        )),
-                    Padding(
-                        padding: const EdgeInsets.fromLTRB(2, 0, 0, 0),
-                        child: OutlinedButton(
-                          style: ButtonStyle(
-                              foregroundColor: MaterialStateProperty.all<Color>(
-                                  Colors.black),
-                              backgroundColor: MaterialStateProperty.all<Color>(
-                                  Colors.grey.shade300),
-                              shape: MaterialStateProperty.all<
-                                      RoundedRectangleBorder>(
+                      onPressed: () {},
+                      child: Text('Gợi ý'),
+                    )),
+                Padding(
+                    padding: const EdgeInsets.fromLTRB(2, 0, 0, 0),
+                    child: OutlinedButton(
+                      style: ButtonStyle(
+                          foregroundColor:
+                              MaterialStateProperty.all<Color>(Colors.black),
+                          backgroundColor: MaterialStateProperty.all<Color>(
+                              Colors.grey.shade300),
+                          shape:
+                              MaterialStateProperty.all<RoundedRectangleBorder>(
                                   RoundedRectangleBorder(
                                       borderRadius:
                                           BorderRadius.circular(18.0)))),
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          child: Text('Lời mời kết bạn'),
-                        )),
-                  ])),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: Text('Lời mời kết bạn'),
+                    )),
+              ]),
             ),
           ),
-          SliverPadding(
-            padding: const EdgeInsets.fromLTRB(0, 10, 0, 5),
-            sliver: SliverToBoxAdapter(
-              child: Container(
-                  color: Colors.white,
-                  child: Padding(
-                      padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: const [
-                          Text("Danh sách bạn bè   ",
-                              style: TextStyle(fontSize: 20)),
-                          NumberOfFriend(),
-                        ],
-                      ))),
-            ),
+          SliverToBoxAdapter(
+            child: Container(
+                color: Colors.white,
+                child: Padding(
+                    padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: const [
+                        Text("Danh sách bạn bè   ",
+                            style: TextStyle(fontSize: 20)),
+                        NumberOfFriend(),
+                      ],
+                    ))),
           ),
           FriendList(),
         ],
