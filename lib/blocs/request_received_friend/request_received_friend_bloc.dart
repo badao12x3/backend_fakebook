@@ -1,11 +1,13 @@
 import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
+import 'package:fakebook_frontend/blocs/request_received_friend/request_received_friend_event.dart';
+import 'package:fakebook_frontend/blocs/request_received_friend/request_received_friend_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stream_transform/stream_transform.dart';
 
-import 'package:fakebook_frontend/blocs/request_received_friend/request_received_friend_event.dart';
-import 'package:fakebook_frontend/blocs/request_received_friend/request_received_friend_state.dart';
 import 'package:fakebook_frontend/repositories/request_received_friend_repository.dart';
+
+import '../../models/request_received_friend_model.dart';
 
 const throttleDuration = Duration(milliseconds: 100);
 
@@ -55,10 +57,25 @@ class RequestReceivedFriendBloc
   Future<void> _onRequestReceivedFriendAccept(RequestReceivedFriendAccept event,
       Emitter<RequestReceivedFriendState> emit) async {
     try {
-      final String fromUser = event.fromUser;
+      // final RequestReceivedFriend requestReceivedFriend =
+      //     event.requestReceivedFriend;
+      // int index = state.friendRequestReceivedList.requestReceivedFriendList
+      //     .indexOf(requestReceivedFriend);
+      // if (index == -1) return;
+      // print("cho nay" + index.toString());
+      // state.friendRequestReceivedList.requestReceivedFriendList.removeAt(index);
+      // final friendRequestReceivedListData =
+      //     await friendRequestReceivedRepository
+      //         .acceptRequestReceivedFriends(requestReceivedFriend.fromUser);
+      // state.friendRequestReceivedList.requestReceivedFriendList =
+      //     friendRequestReceivedListData.requestReceivedFriendList;
+      // emit(state.copyWith(
+      //     requestReceivedFriendList: state.friendRequestReceivedList));
+      final RequestReceivedFriend requestReceivedFriend =
+          event.requestReceivedFriend;
       final friendRequestReceivedListData =
-          await friendRequestReceivedRepository
-              .acceptRequestReceivedFriends(fromUser);
+      await friendRequestReceivedRepository
+          .acceptRequestReceivedFriends(requestReceivedFriend.fromUser);
       state.friendRequestReceivedList.requestReceivedFriendList =
           friendRequestReceivedListData.requestReceivedFriendList;
       emit(state.copyWith(
@@ -71,10 +88,11 @@ class RequestReceivedFriendBloc
   Future<void> _onRequestReceivedFriendDelete(RequestReceivedFriendDelete event,
       Emitter<RequestReceivedFriendState> emit) async {
     try {
-      final String fromUser = event.fromUser;
+      final RequestReceivedFriend requestReceivedFriend =
+          event.requestReceivedFriend;
       final friendRequestReceivedListData =
           await friendRequestReceivedRepository
-              .deleteRequestReceivedFriends(fromUser);
+              .deleteRequestReceivedFriends(requestReceivedFriend.fromUser);
       state.friendRequestReceivedList.requestReceivedFriendList =
           friendRequestReceivedListData.requestReceivedFriendList;
       emit(state.copyWith(

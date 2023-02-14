@@ -18,23 +18,20 @@ class Friend extends StatelessWidget {
         elevation: 4.0,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             ClipRRect(
-                borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(10.0),
-                    topRight: Radius.circular(10.0)),
+                borderRadius: BorderRadius.circular(10.0),
                 child: Container(
                   child: Image(
                     image: CachedNetworkImageProvider(imageUrl),
-                    fit: BoxFit.fill,
-                    // fit: BoxFit.cover
+                    fit: BoxFit.cover
                   ),
                 )),
             Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(friendName,
-                    textAlign: TextAlign.start,
+                    textAlign: TextAlign.center,
                     style: const TextStyle(fontWeight: FontWeight.bold)))
           ],
         ),

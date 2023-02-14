@@ -1,6 +1,7 @@
+import 'package:fakebook_frontend/blocs/friend/friend_bloc.dart';
+import 'package:fakebook_frontend/blocs/personal_info/personal_info_state.dart';
 import 'package:fakebook_frontend/blocs/personal_post/personal_post_bloc.dart';
 import 'package:fakebook_frontend/blocs/personal_post/personal_post_event.dart';
-import 'package:fakebook_frontend/blocs/post/post_bloc.dart';
 import 'package:fakebook_frontend/models/post_model.dart';
 import 'package:fakebook_frontend/screens/personal/widgets/friend.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +15,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../blocs/auth/auth_bloc.dart';
+import '../../blocs/friend/friend_event.dart';
+import '../../blocs/friend/friend_state.dart';
+import '../../blocs/personal_info/personal_info_bloc.dart';
+import '../../blocs/personal_info/personal_info_event.dart';
 import '../../blocs/personal_post/personal_post_state.dart';
 import '../../common/widgets/bottom_loader.dart';
 import '../../models/auth_user_model.dart';
@@ -63,54 +68,59 @@ class _PersonalScreenState extends State<PersonalScreen> {
     return currentScroll >= (maxScroll * 0.95);
   }
 
-
   void _onScroll() {
-    if (_isBottom){
-      context.read<PersonalPostBloc>().add(PersonalPostFetched(accountId: userId));
+    if (_isBottom) {
+      context
+          .read<PersonalPostBloc>()
+          .add(PersonalPostFetched(accountId: userId));
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    // print("#PersonalScreen: $accountId");
-
-    // final postList = BlocProvider.of<PostBloc>(context).state;
-    // print("#PersonalScreen: " + postList.postList.toString());
     context.read<PersonalPostBloc>().add(PersonalPostReload(accountId: userId));
-    context.read<PersonalPostBloc>().add(PersonalPostFetched(accountId: userId));
+    context
+        .read<PersonalPostBloc>()
+        .add(PersonalPostFetched(accountId: userId));
+    if (isMe) {
+      context.read<PersonalInfoBloc>().add(PersonalInfoFetched());
+      context.read<FriendBloc>().add(FriendFetched());
+    } else {
+      context
+          .read<PersonalInfoBloc>()
+          .add(PersonalInfoOfAnotherUserFerched(id: accountId.toString()));
+      context
+          .read<FriendBloc>()
+          .add(FriendOfAnotherUserFetched(id: accountId.toString()));
+    }
+
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        automaticallyImplyLeading: false,
-        leading: Builder(
-          builder: (BuildContext context) {
-            return isMe ?
-              Icon(Icons.menu, color: Colors.black, size: 30) :
-              IconButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  icon: Icon(Icons.arrow_back_ios, color: Colors.black)
-              );
-          },
-        ),
-        title: Text(
-            currentUser.name,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.bold,
-              fontSize: 18.0,
-            ),
+          backgroundColor: Colors.white,
+          automaticallyImplyLeading: false,
+          leading: Builder(
+            builder: (context) {
+              return isMe
+                  ? Icon(Icons.menu, color: Colors.black, size: 30)
+                  : IconButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      icon: Icon(Icons.arrow_back_ios, color: Colors.black));
+            },
           ),
-        centerTitle: true
-      ),
+          title: UserNameHeader(),
+          centerTitle: true),
       body: RefreshIndicator(
         color: Colors.blue,
         backgroundColor: Colors.white,
         onRefresh: () async {
-          context.read<PersonalPostBloc>().add(PersonalPostReload(accountId: userId));
-          context.read<PersonalPostBloc>().add(PersonalPostFetched(accountId: userId));
+          context
+              .read<PersonalPostBloc>()
+              .add(PersonalPostReload(accountId: userId));
+          context
+              .read<PersonalPostBloc>()
+              .add(PersonalPostFetched(accountId: userId));
           return Future<void>.delayed(const Duration(seconds: 2));
         },
         child: CustomScrollView(
@@ -123,43 +133,9 @@ class _PersonalScreenState extends State<PersonalScreen> {
                     height: 250.0,
                     color: Colors.white,
                   ),
-                  GestureDetector(
-                    onTap: () {
-                      showModalBottomSheet(
-                          context: context,
-                          builder: (context) => CoverBottomSheet());
-                    },
-                    child: Container(
-                      width: double.infinity,
-                      height: 210.0,
-                      decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: CachedNetworkImageProvider(
-                                currentUser.imageUrl),
-                            fit: BoxFit.cover,
-                          )),
-                    ),
-                  ),
+                  CoverImage(),
                   Positioned(top: 160, left: 360, child: CameraButton()),
-                  Positioned(
-                      top: 80.0,
-                      left: 20.0,
-                      child: CircleAvatar(
-                        radius: 85.0,
-                        backgroundColor: Colors.white,
-                        child: GestureDetector(
-                          onTap: () {
-                            showModalBottomSheet(
-                                context: context,
-                                builder: (context) => AvatarBottomSheet());
-                          },
-                          child: CircleAvatar(
-                            radius: 80.0,
-                            backgroundImage:
-                            CachedNetworkImageProvider(currentUser.imageUrl),
-                          ),
-                        ),
-                      )),
+                  Positioned(top: 80.0, left: 20.0, child: Avatar()),
                   Positioned(top: 200, left: 135, child: CameraButton())
                 ],
               ),
@@ -167,17 +143,12 @@ class _PersonalScreenState extends State<PersonalScreen> {
             SliverToBoxAdapter(
               child: Container(
                 padding:
-                const EdgeInsets.symmetric(horizontal: 13.0, vertical: 8.0),
+                    const EdgeInsets.symmetric(horizontal: 13.0, vertical: 8.0),
                 color: Colors.white,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      currentUser.name,
-                      textAlign: TextAlign.left,
-                      style: const TextStyle(
-                          fontSize: 30.0, fontWeight: FontWeight.bold),
-                    ),
+                    UserName(),
                     const SizedBox(height: 15.0),
                     GestureDetector(
                       onTap: () {
@@ -188,7 +159,7 @@ class _PersonalScreenState extends State<PersonalScreen> {
                       },
                       child: ClipRRect(
                         borderRadius:
-                        const BorderRadius.all(Radius.circular(10.0)),
+                            const BorderRadius.all(Radius.circular(10.0)),
                         child: Container(
                             alignment: Alignment.center,
                             width: double.infinity,
@@ -208,19 +179,7 @@ class _PersonalScreenState extends State<PersonalScreen> {
                       children: [
                         const Icon(Icons.cases_sharp),
                         const SizedBox(width: 10.0),
-                        RichText(
-                            text: const TextSpan(children: [
-                              TextSpan(
-                                  text: "Sống và làm việc tại ",
-                                  style:
-                                  TextStyle(fontSize: 16.0, color: Colors.black)),
-                              TextSpan(
-                                  text: "Hà Nội",
-                                  style: TextStyle(
-                                      fontSize: 17.0,
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.bold))
-                            ]))
+                        LocationText()
                       ],
                     ),
                     const SizedBox(height: 10.0),
@@ -230,53 +189,23 @@ class _PersonalScreenState extends State<PersonalScreen> {
                       children: const [
                         Expanded(
                             child: Text(
-                              "Friends",
-                              style: TextStyle(
-                                  fontSize: 22.0, fontWeight: FontWeight.bold),
-                            )),
+                          "Bạn bè",
+                          style: TextStyle(
+                              fontSize: 22.0, fontWeight: FontWeight.bold),
+                        )),
                         Text(
-                          "Find Friends",
+                          "Xem thêm>>",
                           style: TextStyle(
                               fontSize: 17.0, color: Palette.facebookBlue),
                         ),
                         SizedBox(height: 10.0),
                       ],
                     ),
-                    Text("69 friends",
-                        style:
-                        TextStyle(fontSize: 17.0, color: Colors.grey[700])),
-                    // Friend(friendName: "Hoang", imageUrl: currentUser.imageUrl)
+                    NumberOfFriend(),
                     const SizedBox(
                       height: 10.0,
                     ),
-                    // Container(
-                    //   height: 800.0,
-                    //   child: GridView.count(
-                    //     crossAxisCount: 3,
-                    //     children: List.generate(6, (index) {
-                    //       return Friend(friendName: "Friend $index",
-                    //           imageUrl: currentUser.imageUrl);
-                    //     }),
-                    //   ),
-                    // )
-                    Container(
-                      height: 300.0,
-                      child: GridView.builder(
-                        itemCount: 6,
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 3,
-                            childAspectRatio: MediaQuery.of(context).size.width /
-                                (MediaQuery.of(context).size.height/1.5)),
-                        itemBuilder: (context, index) {
-                          return GridTile(
-                            child: Friend(
-                              friendName: "Friend $index", imageUrl: currentUser.imageUrl,
-                            ),
-                            // child: index%2 == 0?Container(color: Colors.red):Container(color: Colors.blue,)
-                          );
-                        },
-                      ),
-                    )
+                    Container(height: 300.0, child: ListFriendCompact())
                   ],
                 ),
               ),
@@ -290,6 +219,145 @@ class _PersonalScreenState extends State<PersonalScreen> {
   }
 }
 
+class UserNameHeader extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<PersonalInfoBloc, PersonalInfoState>(
+        builder: (context, state) {
+      final userInfo = state.userInfo;
+      return Text(userInfo.name,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.bold,
+              fontSize: 18.0));
+    });
+  }
+}
+
+class UserName extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<PersonalInfoBloc, PersonalInfoState>(
+        builder: (context, state) {
+      final userInfo = state.userInfo;
+      return Text(userInfo.name,
+          textAlign: TextAlign.left,
+          style: const TextStyle(fontSize: 30.0, fontWeight: FontWeight.bold));
+    });
+  }
+}
+
+class Avatar extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<PersonalInfoBloc, PersonalInfoState>(
+        builder: (context, state) {
+      final userInfo = state.userInfo;
+      return CircleAvatar(
+        radius: 85.0,
+        backgroundColor: Colors.white,
+        child: GestureDetector(
+          onTap: () {
+            showModalBottomSheet(
+                context: context, builder: (context) => AvatarBottomSheet());
+          },
+          child: CircleAvatar(
+            radius: 80.0,
+            backgroundImage: CachedNetworkImageProvider(userInfo.avatar),
+          ),
+        ),
+      );
+    });
+  }
+}
+
+class CoverImage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<PersonalInfoBloc, PersonalInfoState>(
+        builder: (context, state) {
+      final userInfo = state.userInfo;
+      return GestureDetector(
+        onTap: () {
+          showModalBottomSheet(
+              context: context, builder: (context) => CoverBottomSheet());
+        },
+        child: Container(
+          width: double.infinity,
+          height: 210.0,
+          decoration: BoxDecoration(
+              image: DecorationImage(
+            image: CachedNetworkImageProvider(userInfo.coverImage),
+            fit: BoxFit.cover,
+          )),
+        ),
+      );
+    });
+  }
+}
+
+class LocationText extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<PersonalInfoBloc, PersonalInfoState>(
+        builder: (context, state) {
+      final userInfo = state.userInfo;
+      var location = "${userInfo.city}, ${userInfo.country}";
+      return RichText(
+          text: TextSpan(children: [
+        const TextSpan(
+            text: "Sống và làm việc tại ",
+            style: TextStyle(fontSize: 16.0, color: Colors.black)),
+        TextSpan(
+            text: location,
+            style: const TextStyle(
+                fontSize: 17.0,
+                color: Colors.black,
+                fontWeight: FontWeight.bold))
+      ]));
+    });
+  }
+}
+
+class NumberOfFriend extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<FriendBloc, FriendState>(builder: (context, state) {
+      final listFriend = state.listFriendState;
+      return Text(listFriend.listFriend.length.toString(),
+          style: TextStyle(fontSize: 17.0, color: Colors.grey[700]));
+    });
+  }
+}
+
+class ListFriendCompact extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<FriendBloc, FriendState>(builder: (context, state) {
+      final listFriend = state.listFriendState;
+      return GridView.builder(
+        itemCount: 3,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 3,
+            childAspectRatio: MediaQuery.of(context).size.width /
+                (MediaQuery.of(context).size.height / 1.5)),
+        itemBuilder: (context, index) {
+          return index >= listFriend.listFriend.length
+              ? const GridTile(
+                  child: Padding(padding: EdgeInsets.fromLTRB(200, 200, 0, 0)))
+              : GridTile(
+                  child: Friend(
+                    friendName: listFriend.listFriend[index].name,
+                    imageUrl: listFriend.listFriend[index].avatar,
+                  ),
+                );
+        },
+      );
+    });
+  }
+}
+
 class PersonalPostList extends StatefulWidget {
   const PersonalPostList({
     Key? key,
@@ -300,31 +368,30 @@ class PersonalPostList extends StatefulWidget {
 }
 
 class _PersonalPostListState extends State<PersonalPostList> {
-
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<PersonalPostBloc, PersonalPostState>(
         builder: (context, state) {
-          // switch case hết giá trị thì BlocBuilder sẽ tự hiểu không bao giờ rơi vào trường hợp null ---> Siêu ghê
-          switch (state.status) {
-            case PersonalPostStatus.initial:
-              return const SliverToBoxAdapter(child: Center(child: CircularProgressIndicator()));
-            case PersonalPostStatus.loading:
-              return const SliverToBoxAdapter(child: Center(child: CircularProgressIndicator()));
-            case PersonalPostStatus.failure:
-              return const SliverToBoxAdapter(child: Center(child: Text('Failed to fetch posts')));
-            case PersonalPostStatus.success:
-              return SliverList(
-                  delegate: SliverChildBuilderDelegate((context, index) {
-                    return index >= state.postList.posts.length
-                        ? const BottomLoader()
-                        : PostContainer(post: state.postList.posts[index] as Post);
-                  },
-                      childCount: state.postList.posts.length)
-              );
-          // return const Center(child: Text('Successed to fetch posts'));
-          }
-        }
-    );
+      // switch case hết giá trị thì BlocBuilder sẽ tự hiểu không bao giờ rơi vào trường hợp null ---> Siêu ghê
+      switch (state.status) {
+        case PersonalPostStatus.initial:
+          return const SliverToBoxAdapter(
+              child: Center(child: CircularProgressIndicator()));
+        case PersonalPostStatus.loading:
+          return const SliverToBoxAdapter(
+              child: Center(child: CircularProgressIndicator()));
+        case PersonalPostStatus.failure:
+          return const SliverToBoxAdapter(
+              child: Center(child: Text('Failed to fetch posts')));
+        case PersonalPostStatus.success:
+          return SliverList(
+              delegate: SliverChildBuilderDelegate((context, index) {
+            return index >= state.postList.posts.length
+                ? const BottomLoader()
+                : PostContainer(post: state.postList.posts[index] as Post);
+          }, childCount: state.postList.posts.length));
+        // return const Center(child: Text('Successed to fetch posts'));
+      }
+    });
   }
 }
