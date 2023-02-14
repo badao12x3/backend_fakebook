@@ -4,12 +4,14 @@ import 'package:cached_network_image/cached_network_image.dart';
 
 import 'package:fakebook_frontend/models/local/models.dart';
 
+import '../../../constants/localdata/user_data.dart';
+
 class CreatePostContainer extends StatelessWidget {
-  final User currentUser;
-  const CreatePostContainer({Key? key, required this.currentUser}): super(key: key);
+  const CreatePostContainer({Key? key}): super(key: key);
 
   @override
   Widget build(BuildContext context) {
+
     return Container(
       padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
       color: Colors.white,
