@@ -244,5 +244,44 @@ class PostRepository {
     }
   }
 
+  Future<void> reportPost({required String postId, required String subject, required String details}) async {
+    final url = Uri.http(Configuration.baseUrlConnect, '/post/report_post');
 
+    var token = await Token.getToken();
+    try {
+      final response = await http.post(url,
+          headers: <String, String>{
+            HttpHeaders.authorizationHeader: token,
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          body: jsonEncode(<String, dynamic>{
+            'id': postId,
+            'subject': subject,
+            'details': details
+          })
+      );
+    } catch(error) {
+      throw Exception('${error} - Error to report post');
+    }
+  }
+
+  Future<bool> deletePost({required String postId}) async {
+    final url = Uri.http(Configuration.baseUrlConnect, '/post/delete_post/$postId');
+
+    var token = await Token.getToken();
+    try {
+      final response = await http.delete(url, headers: {
+        HttpHeaders.authorizationHeader: token,
+      });
+      if (response.statusCode == 200) {
+        return true;
+      } else if (response.statusCode == 400) {
+        return false;
+      } else {
+        return false;
+      }
+    } catch(error) {
+      throw Exception('${error} - Error to delete post');
+    }
+  }
 }
