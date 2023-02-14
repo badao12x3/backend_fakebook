@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
-import 'package:fakebook_frontend/screens/friend/widgets/friend_widgets.dart';
-
 class NotificationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {

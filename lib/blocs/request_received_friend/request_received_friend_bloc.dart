@@ -76,10 +76,21 @@ class RequestReceivedFriendBloc
       final friendRequestReceivedListData =
       await friendRequestReceivedRepository
           .acceptRequestReceivedFriends(requestReceivedFriend.fromUser);
-      state.friendRequestReceivedList.requestReceivedFriendList =
-          friendRequestReceivedListData.requestReceivedFriendList;
-      emit(state.copyWith(
-          requestReceivedFriendList: state.friendRequestReceivedList));
+      // state.friendRequestReceivedList.requestReceivedFriendList =
+      //     friendRequestReceivedListData.requestReceivedFriendList;
+      // emit(state.copyWith(
+      //     requestReceivedFriendList: state.friendRequestReceivedList));
+
+ 
+      final friendRequestReceivedList = state.friendRequestReceivedList as FriendRequestReceivedList;
+      final friendRequestReceiveds = friendRequestReceivedList.requestReceivedFriendList as List<RequestReceivedFriend>;
+      int index = friendRequestReceiveds.indexOf(requestReceivedFriend);
+      print(index);
+      print(state.friendRequestReceivedList.requestReceivedFriendList.length);
+      state.friendRequestReceivedList.requestReceivedFriendList.removeAt(index);
+      print(state.friendRequestReceivedList.requestReceivedFriendList.length);
+      print(friendRequestReceiveds.length);
+      emit(RequestReceivedFriendState(friendRequestReceivedList: FriendRequestReceivedList(requestReceivedFriendList: friendRequestReceiveds)));
     } catch (_) {
       emit(state.copyWith());
     }

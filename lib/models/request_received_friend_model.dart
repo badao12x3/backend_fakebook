@@ -1,3 +1,5 @@
+import 'package:equatable/equatable.dart';
+
 class FriendRequestReceivedList {
   List<RequestReceivedFriend> requestReceivedFriendList;
 
@@ -30,7 +32,7 @@ class FriendRequestReceivedList {
       };
 }
 
-class RequestReceivedFriend {
+class RequestReceivedFriend extends Equatable{
   RequestReceivedFriend({
     required this.fromUser,
     required this.name,
@@ -70,4 +72,8 @@ class RequestReceivedFriend {
         "avatar": avatar,
         "createdAt": createdAt,
       };
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [fromUser, name, avatar, createdAt];
 }

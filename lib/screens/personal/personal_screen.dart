@@ -205,7 +205,7 @@ class _PersonalScreenState extends State<PersonalScreen> {
                     const SizedBox(
                       height: 10.0,
                     ),
-                    Container(height: 300.0, child: ListFriendCompact())
+                    Container(height: 150.0, child: ListFriendCompact())
                   ],
                 ),
               ),
