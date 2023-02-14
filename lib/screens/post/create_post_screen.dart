@@ -9,7 +9,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:video_player/video_player.dart';
 import 'package:flutter/material.dart';
 
-import 'package:fakebook_frontend/constants/assets/palette.dart';
 import 'package:fakebook_frontend/constants/localdata/local_data.dart';
 import 'package:fakebook_frontend/screens/post/widgets/post_widgets.dart';
 

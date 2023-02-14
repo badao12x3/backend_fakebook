@@ -1,5 +1,5 @@
 import 'package:fakebook_frontend/common/widgets/common_widgets.dart';
-import 'package:fakebook_frontend/screens/friend/widgets/request_container.dart';
+import 'package:fakebook_frontend/screens/request_received_friend/widgets/request_container.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -135,7 +135,7 @@ class NumberOfFriendRequests extends StatelessWidget {
       final friendRequestReceivedList = state.friendRequestReceivedList;
       return Text(
           friendRequestReceivedList.requestReceivedFriendList.length.toString(),
-          style: TextStyle(
+          style: const TextStyle(
               fontSize: 20, fontWeight: FontWeight.bold, color: Colors.red));
     });
   }
@@ -148,11 +148,7 @@ class FriendRequests extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    DateTime dt1 = DateTime.now();
-    DateTime dt2 = DateTime.parse(requestReceivedFriend.createdAt);
-    final Duration diff = dt1.difference(dt2);
-    final String timeAgo =
-        diff.inDays == 0 ? "${diff.inHours}h" : "${diff.inDays}d";
+
     return Container(
       color: Colors.white,
       child: Column(
@@ -164,10 +160,7 @@ class FriendRequests extends StatelessWidget {
               Padding(
                   padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
                   child: RequestContainer(
-                      fromUser: requestReceivedFriend.fromUser,
-                      name: requestReceivedFriend.name,
-                      avtUrl: requestReceivedFriend.avatar,
-                      timeAgo: timeAgo)),
+                      requestReceivedFriend: requestReceivedFriend)),
             ]),
           ),
         ],

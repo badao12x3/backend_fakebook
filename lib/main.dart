@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:bloc/bloc.dart';
 import 'package:fakebook_frontend/blocs/comment/comment_bloc.dart';
+import 'package:fakebook_frontend/blocs/friend/friend_bloc.dart';
 import 'package:fakebook_frontend/blocs/personal_post/personal_post_bloc.dart';
 import 'package:fakebook_frontend/blocs/list_video/list_video_bloc.dart';
 import 'package:fakebook_frontend/blocs/post_detail/post_detail_bloc.dart';
@@ -25,6 +26,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import './screens/screens.dart';
+import 'blocs/personal_info/personal_info_bloc.dart';
 import 'blocs/post/post_bloc.dart';
 import 'blocs/request_received_friend/request_received_friend_bloc.dart';
 
@@ -70,13 +72,17 @@ class MyApp extends StatelessWidget {
             lazy: false,
             create: (_) => ListVideoBloc(videoRepository: videoRepository)
         ),
-        BlocProvider<PostDetailBloc>(
-            lazy: false,
-            create: (_) => PostDetailBloc(postRepository: postRepository)
-        ),
         BlocProvider<RequestReceivedFriendBloc>(
             lazy: false,
             create: (_) => RequestReceivedFriendBloc()
+        ),
+        BlocProvider<PersonalInfoBloc>(
+          lazy: false,
+          create: (_) => PersonalInfoBloc(),
+        ),
+        BlocProvider<FriendBloc>(
+          lazy: false,
+          create: (_) => FriendBloc(),
         )
       ],
       child: MaterialApp(

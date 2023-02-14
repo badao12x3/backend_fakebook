@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
 
+import '../../models/request_received_friend_model.dart';
+
 abstract class RequestReceivedFriendEvent extends Equatable {
   @override
   List<Object> get props => [];
@@ -8,11 +10,11 @@ abstract class RequestReceivedFriendEvent extends Equatable {
 class RequestReceivedFriendFetched extends RequestReceivedFriendEvent {}
 
 class RequestReceivedFriendAccept extends RequestReceivedFriendEvent {
-  final String fromUser;
-  RequestReceivedFriendAccept({required this.fromUser});
+  final RequestReceivedFriend requestReceivedFriend;
+  RequestReceivedFriendAccept({required this.requestReceivedFriend});
 }
 
 class RequestReceivedFriendDelete extends RequestReceivedFriendEvent {
-  final String fromUser;
-  RequestReceivedFriendDelete({required this.fromUser});
+  final RequestReceivedFriend requestReceivedFriend;
+  RequestReceivedFriendDelete({required this.requestReceivedFriend});
 }

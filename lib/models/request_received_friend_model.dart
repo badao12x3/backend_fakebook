@@ -1,11 +1,3 @@
-import 'dart:convert';
-
-FriendRequestReceivedList friendRequestReceivedListFromJson(String str) =>
-    FriendRequestReceivedList.fromJson(json.decode(str));
-
-String friendRequestReceivedListToJson(FriendRequestReceivedList data) =>
-    json.encode(data.toJson());
-
 class FriendRequestReceivedList {
   List<RequestReceivedFriend> requestReceivedFriendList;
 
