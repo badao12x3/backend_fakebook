@@ -10,7 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   late final AuthRepository authRepository;
 
-  AuthBloc(): super(AuthState.initial()) {
+  AuthBloc() : super(AuthState.initial()) {
     authRepository = AuthRepository();
 
     on<Login>(_onLogin);
@@ -23,25 +23,35 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     final phone = event.phone;
     final password = event.password;
     try {
-      final authUser = await authRepository.login(phone: phone, password: password);
-      if(authUser.code == '1000' && authUser.message == 'OK') {
+      final authUser =
+          await authRepository.login(phone: phone, password: password);
+      if (authUser.code == '1000' && authUser.message == 'OK') {
         emit(AuthState(status: AuthStatus.authenticated, authUser: authUser));
         // lưu thông tin user login vào local storage/cache để lấy id/token/name
         final userInfo = state.authUser;
         final _id = userInfo.id;
         final _name = userInfo.name;
         final _token = userInfo.token;
-        Map<String, dynamic> user = {'id': _id, 'name': _name, 'token': _token};
+        final _avatar = userInfo.avatar;
+        final _active = userInfo.active;
+        Map<String, dynamic> user = {
+          'id': _id,
+          'name': _name,
+          'token': _token,
+          'avatar': _avatar,
+          'active': _active
+        };
         // print("#Auth_bloc: "+user.toString());
         final prefs = await SharedPreferences.getInstance();
         // editor có thể hiển thị &quot; hoặc "" ---> không ảnh hưởng gì
         await prefs.setString('user', jsonEncode(user));
       }
-      if(authUser.code == '9995') {
+      if (authUser.code == '9995') {
         emit(AuthState(status: AuthStatus.unauthenticated, authUser: authUser));
       }
-    } catch(_) {
-      emit(state.copyWith(status: AuthStatus.unknown, authUser: AuthUser.initial()));
+    } catch (_) {
+      emit(state.copyWith(
+          status: AuthStatus.unknown, authUser: AuthUser.initial()));
     }
   }
 
@@ -51,21 +61,33 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     final successRemoveUserData = await prefs.remove('user');
     // print(successRemoveUserData);
     authRepository.logout();
-    emit(state.copyWith(status: AuthStatus.unauthenticated, authUser: AuthUser.initial()));
+    emit(state.copyWith(
+        status: AuthStatus.unauthenticated, authUser: AuthUser.initial()));
   }
 
-  void _checkAndKeepLoginSession(KeepSession event, Emitter<AuthState> emit) async {
+  void _checkAndKeepLoginSession(
+      KeepSession event, Emitter<AuthState> emit) async {
     final prefs = await SharedPreferences.getInstance();
     String? userPref = prefs.getString('user');
     if (userPref != null) {
-      Map<String,dynamic> userMap = jsonDecode(userPref) as Map<String, dynamic>;
+      Map<String, dynamic> userMap =
+          jsonDecode(userPref) as Map<String, dynamic>;
       final _id = userMap['id'];
       final _name = userMap['name'];
       final _token = userMap['token'];
-      emit(AuthState(status: AuthStatus.authenticated, authUser: AuthUser(code: '200', message: 'OK restore login session', id: _id, name: _name, token: _token, avatar: '', active: false)));
+      final _avatar = userMap['avatar'];
+      emit(AuthState(
+          status: AuthStatus.authenticated,
+          authUser: AuthUser(
+              code: '200',
+              message: 'OK restore login session',
+              id: _id,
+              name: _name,
+              token: _token,
+              avatar: _avatar,
+              active: false)));
     }
   }
-
 
   @override
   void onError(Object error, StackTrace stackTrace) {
@@ -88,7 +110,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   @override
   void onChange(Change<AuthState> change) {
     super.onChange(change);
-    print('#AUTH OBSERVER: { stateCurrent:  statusCurrent: ${change.currentState.status}, authUserCurrent: ${change.currentState.authUser} }');
-    print('#AUTH OBSERVER: { stateNext:  statusNext: ${change.nextState.status}, authUserNext: ${change.nextState.authUser} }');
+    print(
+        '#AUTH OBSERVER: { stateCurrent:  statusCurrent: ${change.currentState.status}, authUserCurrent: ${change.currentState.authUser} }');
+    print(
+        '#AUTH OBSERVER: { stateNext:  statusNext: ${change.nextState.status}, authUserNext: ${change.nextState.authUser} }');
   }
 }

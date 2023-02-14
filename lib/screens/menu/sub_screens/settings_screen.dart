@@ -1,3 +1,4 @@
+import 'package:fakebook_frontend/screens/block/block_screen.dart';
 import 'package:fakebook_frontend/screens/menu/sub_screens/pass_sec_screen.dart';
 import 'package:fakebook_frontend/screens/menu/sub_screens/per_acc_info_screen.dart';
 import 'package:fakebook_frontend/screens/menu/sub_screens/notificationsettings/notification_settings_screen.dart';
@@ -36,17 +37,16 @@ class SettingsScreen extends StatelessWidget {
                   const _Settings_Description(
                       settingsName: 'Account',
                       settingsDes:
-                      'Update your info to keep your account secure'),
+                          'Update your info to keep your account secure'),
                   const SizedBox(height: 5.0),
                   _SettingsButton(
-                      onPressed: () =>
-                      {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    PersonalAccountInfo()))
-                      },
+                      onPressed: () => {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        PersonalAccountInfo()))
+                          },
                       icon: Icons.account_circle,
                       buttonName: 'Personal and account information')
                 ],
@@ -65,7 +65,7 @@ class SettingsScreen extends StatelessWidget {
                     const _Settings_Description(
                         settingsName: 'Security',
                         settingsDes:
-                        'Change your password and take other actions to increase the security of your account'),
+                            'Change your password and take other actions to increase the security of your account'),
                     const SizedBox(height: 5.0),
                     _SettingsButton(
                         onPressed: () {
@@ -91,12 +91,54 @@ class SettingsScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     const _Settings_Description(
+                        settingsName: 'Audience and visibility',
+                        settingsDes:
+                            'Control who can see your posts, stories and profile'),
+                    const SizedBox(height: 5.0),
+                    _SettingsButton(
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => BlockScreen()));
+                        },
+                        icon: Icons.block,
+                        buttonName: 'Block'),
+                    _SettingsButton(
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      NotificationSettingsScreen()));
+                        },
+                        icon: Icons.check_circle,
+                        buttonName: 'Active status')
+                  ],
+                ),
+              ),
+            ),
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(0.0, 8.0, 0.0, 0.0),
+            sliver: SliverToBoxAdapter(
+              child: Container(
+                padding: EdgeInsets.fromLTRB(0.0, 17.0, 0.0, 2.0),
+                color: Colors.white,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const _Settings_Description(
                         settingsName: 'Preferences',
                         settingsDes: 'Customize your experience on Facebook'),
                     const SizedBox(height: 5.0),
                     _SettingsButton(
                         onPressed: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context)=>NotificationSettingsScreen()));
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      NotificationSettingsScreen()));
                         },
                         icon: Icons.notifications_none,
                         buttonName: 'Notifications')

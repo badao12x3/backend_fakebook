@@ -2,7 +2,9 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:bloc/bloc.dart';
+import 'package:fakebook_frontend/blocs/block/block_bloc.dart';
 import 'package:fakebook_frontend/blocs/post_detail/post_detail_bloc.dart';
+import 'package:fakebook_frontend/repositories/block_repository.dart';
 import 'package:fakebook_frontend/repositories/post_repository.dart';
 import 'package:fakebook_frontend/routes.dart';
 import 'package:fakebook_frontend/blocs/auth/auth_bloc.dart';
@@ -20,8 +22,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import './screens/screens.dart';
 import 'blocs/post/post_bloc.dart';
 
-
-void main() async{
+void main() async {
   // debug global BLOC, suggesting turn off, please override in debug local BLOC
   Bloc.observer = SimpleBlocObserver();
   runApp(MyApp());
@@ -34,42 +35,41 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     PostRepository postRepository = PostRepository();
+    BlockRepository blockRepository = BlockRepository();
     return MultiBlocProvider(
       providers: [
         BlocProvider<AuthBloc>(
-          lazy: false,
-          create: (_) => AuthBloc()..add(KeepSession())
-        ),
+            lazy: false, create: (_) => AuthBloc()..add(KeepSession())),
         BlocProvider<PostBloc>(
           lazy: false,
           create: (_) => PostBloc(postRepository: postRepository),
         ),
         BlocProvider<PostDetailBloc>(
             lazy: false,
-            create: (_) => PostDetailBloc(postRepository: postRepository)
-        )
+            create: (_) => PostDetailBloc(postRepository: postRepository)),
+        BlocProvider<BlockedAccountsBloc>(
+            lazy: false,
+            create: (_) =>
+                BlockedAccountsBloc(blockRepository: blockRepository))
       ],
       child: MaterialApp(
-        title: 'Fakebook',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-          visualDensity: VisualDensity.adaptivePlatformDensity,
-          scaffoldBackgroundColor: Palette.scaffold
-        ),
-        home: BlocBuilder<AuthBloc, AuthState>(
-            builder: (context, state) {
-              switch (state.status) {
-                case AuthStatus.unknown:
-                  return LoginScreen();
-                case AuthStatus.unauthenticated:
-                  return LoginScreen();
-                case AuthStatus.authenticated:
-                  return NavScreen();
-              }
+          title: 'Fakebook',
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+              primarySwatch: Colors.blue,
+              visualDensity: VisualDensity.adaptivePlatformDensity,
+              scaffoldBackgroundColor: Palette.scaffold),
+          home: BlocBuilder<AuthBloc, AuthState>(builder: (context, state) {
+            switch (state.status) {
+              case AuthStatus.unknown:
+                return LoginScreen();
+              case AuthStatus.unauthenticated:
+                return LoginScreen();
+              case AuthStatus.authenticated:
+                return NavScreen();
             }
-        ),
-        onGenerateRoute: (settings) {
+          }),
+          onGenerateRoute: (settings) {
             switch (settings.name) {
               // case Routes.home_screen:
               //   return MyApp(); // lỗi
@@ -79,11 +79,13 @@ class MyApp extends StatelessWidget {
                 return MaterialPageRoute(builder: (_) => LoginScreen());
               case Routes.nav_screen:
                 return MaterialPageRoute(builder: (_) => NavScreen());
-              case Routes.post_detail_screen: {
-                // return MaterialPageRoute(builder: (_) => PostDetailScreen()); // null arguments ???
-                final postId = settings.arguments as String;
-                return MaterialPageRoute(builder: (_) => PostDetailScreen(postId: postId));
-              }
+              case Routes.post_detail_screen:
+                {
+                  // return MaterialPageRoute(builder: (_) => PostDetailScreen()); // null arguments ???
+                  final postId = settings.arguments as String;
+                  return MaterialPageRoute(
+                      builder: (_) => PostDetailScreen(postId: postId));
+                }
               case Routes.create_post_screen:
                 return MaterialPageRoute(builder: (_) => CreatePostScreen());
               case Routes.emotion_screen:
@@ -91,9 +93,7 @@ class MyApp extends StatelessWidget {
               default:
                 return MaterialPageRoute(builder: (_) => NavScreen());
             }
-        }
-      ),
+          }),
     );
   }
 }
-
