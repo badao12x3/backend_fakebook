@@ -18,6 +18,7 @@ import 'package:fakebook_frontend/blocs/auth/auth_state.dart';
 import 'package:fakebook_frontend/configuration.dart';
 import 'package:fakebook_frontend/screens/personal/personal_screen.dart';
 import 'package:fakebook_frontend/screens/post/emotion_screen.dart';
+import 'package:fakebook_frontend/screens/messenger/messenger_screen.dart';
 import 'package:fakebook_frontend/simple_bloc_observer.dart';
 import 'package:flutter/material.dart';
 
@@ -25,6 +26,7 @@ import 'package:fakebook_frontend/constants/assets/palette.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import './screens/screens.dart';
 import 'blocs/personal_info/personal_info_bloc.dart';
 import 'blocs/post/post_bloc.dart';
@@ -32,13 +34,18 @@ import 'blocs/request_received_friend/request_received_friend_bloc.dart';
 
 
 void main() async{
+  final client = StreamChatClient(
+    '6za27trdby7z',
+    logLevel: Level.OFF,
+  );
   // debug global BLOC, suggesting turn off, please override in debug local BLOC
   Bloc.observer = SimpleBlocObserver();
-  runApp(MyApp());
+  runApp(MyApp(client: client));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final StreamChatClient client;
+  const MyApp({super.key, required this.client});
 
   // This widget is the root of your application.
   @override
@@ -93,6 +100,9 @@ class MyApp extends StatelessWidget {
           visualDensity: VisualDensity.adaptivePlatformDensity,
           scaffoldBackgroundColor: Palette.scaffold
         ),
+        builder: (context, child) {
+          return StreamChat(client: client, child: child);
+        },
         home: BlocBuilder<AuthBloc, AuthState>(
             builder: (context, state) {
               switch (state.status) {
@@ -113,8 +123,10 @@ class MyApp extends StatelessWidget {
               // Bởi vì cập nhật state bằng Bloc nên không cần push từ Login
               case Routes.login_screen:
                 return MaterialPageRoute(builder: (_) => LoginScreen());
+                break;
               case Routes.nav_screen:
                 return MaterialPageRoute(builder: (_) => NavScreen());
+                break;
               case Routes.post_detail_screen: {
                 // return MaterialPageRoute(builder: (_) => PostDetailScreen()); // null arguments ???
                 final postId = settings.arguments as String;
@@ -127,6 +139,9 @@ class MyApp extends StatelessWidget {
               case Routes.personal_screen: {
                 final String? accountId = settings.arguments as String?;
                 return MaterialPageRoute(builder: (_) => PersonalScreen(accountId: accountId));
+              }
+              case Routes.messenger_screen: {
+                return MaterialPageRoute(builder: (_) => MessengerScreen());
               }
               default:
                 return MaterialPageRoute(builder: (_) => NavScreen());
