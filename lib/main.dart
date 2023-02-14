@@ -4,8 +4,10 @@ import 'dart:io';
 import 'package:bloc/bloc.dart';
 import 'package:fakebook_frontend/blocs/comment/comment_bloc.dart';
 import 'package:fakebook_frontend/blocs/personal_post/personal_post_bloc.dart';
+import 'package:fakebook_frontend/blocs/list_video/list_video_bloc.dart';
 import 'package:fakebook_frontend/blocs/post_detail/post_detail_bloc.dart';
 import 'package:fakebook_frontend/repositories/post_repository.dart';
+import 'package:fakebook_frontend/repositories/video_repository.dart';
 import 'package:fakebook_frontend/routes.dart';
 import 'package:fakebook_frontend/blocs/auth/auth_bloc.dart';
 import 'package:fakebook_frontend/blocs/auth/auth_event.dart';
@@ -37,6 +39,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     PostRepository postRepository = PostRepository();
+    VideoRepository videoRepository = VideoRepository();
     return MultiBlocProvider(
       providers: [
         BlocProvider<AuthBloc>(
@@ -58,6 +61,10 @@ class MyApp extends StatelessWidget {
         BlocProvider<CommentBloc>(
           lazy: false,
           create: (_) => CommentBloc(),
+        ),
+        BlocProvider<ListVideoBloc>(
+            lazy: false,
+            create: (_) => ListVideoBloc(videoRepository: videoRepository)
         )
       ],
       child: MaterialApp(

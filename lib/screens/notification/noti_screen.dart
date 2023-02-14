@@ -72,7 +72,7 @@ class NotificationScreen extends StatelessWidget {
               Center(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(0,0,0,5),
-                  child: Text("Ụa hết thông báo òy.",
+                  child: Text("Không còn thông báo mới nào",
                       style: TextStyle(
                           fontSize: 16, color: Colors.grey)),
                 ),
