@@ -28,7 +28,6 @@ class FriendRepository {
       case 200:
         {
           final body = json.decode(response.body) as Map<String, dynamic>;
-          print(body);
           final friendList = ListFriend.fromJson(body);
           return friendList;
         }
@@ -41,7 +40,7 @@ class FriendRepository {
 
   Future<ListFriend> friendOfAnotherUserFetched(String id) async {
     final url =
-    Uri.http(Configuration.baseUrlConnect, '/account/get_list_friends',{
+        Uri.http(Configuration.baseUrlConnect, '/account/get_list_friends', {
       'user_id': id,
     });
 
@@ -67,9 +66,9 @@ class FriendRepository {
         throw Exception('Error fetchRequestReceivedFriends');
     }
   }
+
   Future<Object> deleteFriends(String id) async {
-    final url = Uri.http(
-        Configuration.baseUrlConnect, '/account/del_friend');
+    final url = Uri.http(Configuration.baseUrlConnect, '/account/del_friend');
 
     // get token from local storage/cache
     final prefs = await SharedPreferences.getInstance();
@@ -86,10 +85,7 @@ class FriendRepository {
           HttpHeaders.authorizationHeader: token,
           'Content-Type': 'application/json; charset=UTF-8',
         },
-        body: jsonEncode(<String, dynamic>{
-          'sent_id': id
-        })
-    );
+        body: jsonEncode(<String, dynamic>{'sent_id': id}));
 
     switch (response.statusCode) {
       case 200:
