@@ -180,7 +180,7 @@ class EmotionGrid extends StatelessWidget {
       {'icon': '😤', 'value': 'mạnh mẽ'},
       {'icon': '😟', 'value': 'lo lắng'},
       {'icon': '😌', 'value': 'đặc biệt'},
-      {'icon': '☹', 'value': 'chán nản'},
+      {'icon': '😟', 'value': 'chán nản'},
       {'icon': '😁', 'value': 'vui vẻ'},
       {'icon': '😮', 'value': 'tò mò'},
       {'icon': '😟', 'value': 'ủ dột'},
@@ -190,7 +190,7 @@ class EmotionGrid extends StatelessWidget {
       {'icon': '🥰', 'value': 'tuyệt vời'},
       {'icon': '🤬', 'value': 'cáu'},
       {'icon': '😠', 'value': 'căng thẳng'},
-      {'icon': '☹', 'value': 'thiếu'},
+      {'icon': '😟', 'value': 'thiếu'},
       {'icon': '🤬', 'value': 'kích động'},
       {'icon': '🤪', 'value': 'tinh quái'},
       {'icon': '😮', 'value': 'kinh ngạc'},
@@ -206,12 +206,12 @@ class EmotionGrid extends StatelessWidget {
       {'icon': '😔', 'value': 'nản lòng'},
       {'icon': '😒', 'value': 'tẻ nhạt'},
       {'icon': '🥰', 'value': 'xinh xắn'},
-      {'icon': '😮‍💨', 'value': 'khá hơn'},
+      {'icon': '🤗', 'value': 'khá hơn'},
       {'icon': '😳', 'value': 'tội lỗi'},
-      {'icon': '😮‍💨', 'value': 'an toàn'},
+      {'icon': '🤗', 'value': 'an toàn'},
       {'icon': '😚', 'value': 'tự do'},
       {'icon': '😕', 'value': 'hoang mang'},
-      {'icon': '😞', 'value': 'già nua'},
+      {'icon': '👴', 'value': 'già nua'},
       {'icon': '😪', 'value': 'lười biếng'},
       {'icon': '😰', 'value': 'tồi tệ hơn'},
       {'icon': '😵', 'value': 'khủng khiếp'},
@@ -251,7 +251,7 @@ class EmotionGrid extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  Text('🙂'),
+                  Text(emotionArray[index]["icon"] as String),
                   SizedBox(width: 6),
                   Text(emotionArray[index]["value"] as String)
                 ],
@@ -270,18 +270,18 @@ class ActivityGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final activityArray = [
-      {'icon': 'Đang chúc mừng...', 'value': 'Đang chúc mừng...'},
-      {'icon': 'Đang ăn...', 'value': 'Đang ăn...'},
-      {'icon': 'Đang tham gia...', 'value': 'Đang tham gia...'},
-      {'icon': 'Đang nghe...', 'value': 'Đang nghe...'},
-      {'icon': 'Đang nghĩ về...', 'value': 'Đang nghĩ về...'},
-      {'icon': 'Đang chơi...', 'value': 'Đang chơi...'},
-      {'icon': 'Đang xem...', 'value': 'Đang xem...'},
-      {'icon': 'Đang uống...', 'value': 'Đang uống...'},
-      {'icon': 'Đang đi tới....', 'value': 'Đang đi tới....'},
-      {'icon': 'Đang tìm...', 'value': 'Đang tìm...'},
-      {'icon': 'Đang đọc', 'value': 'Đang đọc'},
-      {'icon': 'Đang ủng hộ...', 'value': 'Đang ủng hộ...'}
+      {'icon': '🥳', 'value': 'Đang chúc mừng...'},
+      {'icon': '🤤', 'value': 'Đang ăn...'},
+      {'icon': '🙋', 'value': 'Đang tham gia...'},
+      {'icon': '🎵', 'value': 'Đang nghe...'},
+      {'icon': '💭', 'value': 'Đang nghĩ về...'},
+      {'icon': '🎮', 'value': 'Đang chơi...'},
+      {'icon': '🎥', 'value': 'Đang xem...'},
+      {'icon': '🧋', 'value': 'Đang uống...'},
+      {'icon': '✈', 'value': 'Đang đi tới....'},
+      {'icon': '🔎', 'value': 'Đang tìm...'},
+      {'icon': '📖', 'value': 'Đang đọc'},
+      {'icon': '💝', 'value': 'Đang ủng hộ...'}
     ];
     return GridView.builder(
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -299,7 +299,7 @@ class ActivityGrid extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  Text('🙂'),
+                  Text(activityArray[index]["icon"] as String),
                   SizedBox(width: 6),
                   Text(activityArray[index]["value"] as String)
                 ],
