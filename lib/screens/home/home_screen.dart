@@ -15,6 +15,7 @@ import 'package:fakebook_frontend/constants/localdata/local_data.dart';
 import 'package:fakebook_frontend/screens/home/widgets/home_widgets.dart';
 
 import '../../blocs/post/post_state.dart';
+import '../messenger/messenger_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   @override
@@ -117,13 +118,15 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
                     icon: const Icon(MdiIcons.facebookMessenger),
                     iconSize: 30,
                     color: Colors.black,
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => MessengerScreen()) );
+                    },
                   ),
                 ),
               ],
             ),
             SliverToBoxAdapter(
-                child: CreatePostContainer(currentUser: currentUser)
+                child: CreatePostContainer()
             ),
             SliverPadding(
               padding: const EdgeInsets.fromLTRB(0, 10, 0, 5),
