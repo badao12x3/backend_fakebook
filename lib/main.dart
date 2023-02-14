@@ -18,6 +18,7 @@ import 'package:fakebook_frontend/blocs/auth/auth_state.dart';
 import 'package:fakebook_frontend/configuration.dart';
 import 'package:fakebook_frontend/screens/personal/personal_screen.dart';
 import 'package:fakebook_frontend/screens/post/emotion_screen.dart';
+import 'package:fakebook_frontend/screens/request_received_friend/sub_screens/list_friend_screen.dart';
 import 'package:fakebook_frontend/simple_bloc_observer.dart';
 import 'package:flutter/material.dart';
 
@@ -127,6 +128,9 @@ class MyApp extends StatelessWidget {
               case Routes.personal_screen: {
                 final String? accountId = settings.arguments as String?;
                 return MaterialPageRoute(builder: (_) => PersonalScreen(accountId: accountId));
+              }
+              case Routes.friend_screen: {
+                return MaterialPageRoute(builder: (_) => FriendScreen());
               }
               default:
                 return MaterialPageRoute(builder: (_) => NavScreen());

@@ -67,4 +67,39 @@ class FriendRepository {
         throw Exception('Error fetchRequestReceivedFriends');
     }
   }
+  Future<Object> deleteFriends(String id) async {
+    final url = Uri.http(
+        Configuration.baseUrlConnect, '/account/del_friend');
+
+    // get token from local storage/cache
+    final prefs = await SharedPreferences.getInstance();
+    String userPref = prefs.getString('user') ?? '{"token": "No userdata"}';
+    Map<String, dynamic> userMap = jsonDecode(userPref) as Map<String, dynamic>;
+    // print("#Post_repository: " + userMap.toString());
+    final token = userMap['token'] != 'No userdata'
+        ? userMap['token']
+        : Configuration.token;
+    // print("#Post_repository: " +  token.toString());
+
+    final response = await http.post(url,
+        headers: <String, String>{
+          HttpHeaders.authorizationHeader: token,
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, dynamic>{
+          'sent_id': id
+        })
+    );
+
+    switch (response.statusCode) {
+      case 200:
+        {
+          return friendsFetch();
+        }
+      case 400:
+        return ListFriend.initial();
+      default:
+        throw Exception('Error deleteRequestReceivedFriends');
+    }
+  }
 }

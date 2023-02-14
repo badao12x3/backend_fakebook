@@ -1,34 +1,37 @@
 import 'package:fakebook_frontend/common/widgets/common_widgets.dart';
+import 'package:fakebook_frontend/models/list_friend_model.dart';
+import 'package:fakebook_frontend/screens/request_received_friend/sub_screens/widgets/friend_container.dart';
 import 'package:fakebook_frontend/screens/request_received_friend/widgets/request_container.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../blocs/request_received_friend/request_received_friend_bloc.dart';
-import '../../blocs/request_received_friend/request_received_friend_event.dart';
-import '../../blocs/request_received_friend/request_received_friend_state.dart';
-import '../../models/request_received_friend_model.dart';
-import '../../routes.dart';
+import '../../../blocs/friend/friend_bloc.dart';
+import '../../../blocs/friend/friend_event.dart';
+import '../../../blocs/friend/friend_state.dart';
+import '../../../blocs/request_received_friend/request_received_friend_bloc.dart';
+import '../../../blocs/request_received_friend/request_received_friend_state.dart';
+import '../../../models/request_received_friend_model.dart';
+import '../../../routes.dart';
 
-class RequestFriendScreen extends StatelessWidget {
+class FriendScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    BlocProvider.of<RequestReceivedFriendBloc>(context)
-        .add(RequestReceivedFriendFetched());
-    return RequestFriendScreenContent();
+    BlocProvider.of<FriendBloc>(context).add(FriendFetched());
+    return FriendScreenContent();
   }
 }
 
-class RequestFriendScreenContent extends StatefulWidget {
-  const RequestFriendScreenContent({
+class FriendScreenContent extends StatefulWidget {
+  const FriendScreenContent({
     Key? key,
   }) : super(key: key);
 
   @override
-  State<RequestFriendScreenContent> createState() => _RequestFriendScreenContent();
+  State<FriendScreenContent> createState() => _FriendScreenContent();
 }
 
-class _RequestFriendScreenContent extends State<RequestFriendScreenContent> {
+class _FriendScreenContent extends State<FriendScreenContent> {
   @override
   Widget build(BuildContext context) {
     print("#POST OBSERVER: Rebuild");
@@ -36,8 +39,12 @@ class _RequestFriendScreenContent extends State<RequestFriendScreenContent> {
       child: CustomScrollView(
         slivers: [
           SliverAppBar(
+            leading: IconButton(
+                icon: Icon(Icons.arrow_back_ios, color: Colors.black),
+                onPressed: () {
+                  Navigator.pop(context);
+                }),
             backgroundColor: Colors.white,
-            automaticallyImplyLeading: false,
             title: const Text("Bạn bè",
                 style: TextStyle(
                     color: Colors.black,
@@ -93,9 +100,9 @@ class _RequestFriendScreenContent extends State<RequestFriendScreenContent> {
                                       borderRadius:
                                           BorderRadius.circular(18.0)))),
                           onPressed: () {
-                            Navigator.pushNamed(context, Routes.friend_screen);
+                            Navigator.pop(context);
                           },
-                          child: Text('Tất cả bạn bè'),
+                          child: Text('Lời mời kết bạn'),
                         )),
                   ])),
             ),
@@ -110,48 +117,43 @@ class _RequestFriendScreenContent extends State<RequestFriendScreenContent> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Text("Lời mời kết bạn  ",
-                              style: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold)),
-                          NumberOfFriendRequests(),
+                        children: const [
+                          Text("Danh sách bạn bè   ",
+                              style: TextStyle(fontSize: 20)),
+                          NumberOfFriend(),
                         ],
                       ))),
             ),
           ),
-          FriendRequestList(),
+          FriendList(),
         ],
       ),
     );
   }
 }
 
-class NumberOfFriendRequests extends StatelessWidget {
-  const NumberOfFriendRequests({
+class NumberOfFriend extends StatelessWidget {
+  const NumberOfFriend({
     Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<RequestReceivedFriendBloc, RequestReceivedFriendState>(
-        builder: (context, state) {
-      final friendRequestReceivedList = state.friendRequestReceivedList;
-      return Text(
-          friendRequestReceivedList.requestReceivedFriendList.length.toString(),
+    return BlocBuilder<FriendBloc, FriendState>(builder: (context, state) {
+      final listFriend = state.listFriendState;
+      return Text(listFriend.listFriend.length.toString(),
           style: const TextStyle(
               fontSize: 20, fontWeight: FontWeight.bold, color: Colors.red));
     });
   }
 }
 
-class FriendRequests extends StatelessWidget {
-  final RequestReceivedFriend requestReceivedFriend;
-  const FriendRequests({Key? key, required this.requestReceivedFriend})
-      : super(key: key);
+class _Friend extends StatelessWidget {
+  final Friend friend;
+  const _Friend({Key? key, required this.friend}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-
     return Container(
       color: Colors.white,
       child: Column(
@@ -162,8 +164,7 @@ class FriendRequests extends StatelessWidget {
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Padding(
                   padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
-                  child: RequestContainer(
-                      requestReceivedFriend: requestReceivedFriend)),
+                  child: FriendContainer(friend: friend)),
             ]),
           ),
         ],
@@ -172,32 +173,26 @@ class FriendRequests extends StatelessWidget {
   }
 }
 
-class FriendRequest extends State<FriendRequestList> {
+class _FriendListState extends State<FriendList> {
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<RequestReceivedFriendBloc, RequestReceivedFriendState>(
-        builder: (context, state) {
-      final friendRequestReceivedList = state.friendRequestReceivedList;
+    return BlocBuilder<FriendBloc, FriendState>(builder: (context, state) {
+      final listFriend = state.listFriendState;
       return SliverList(
           delegate: SliverChildBuilderDelegate((context, index) {
-        return index >=
-                friendRequestReceivedList.requestReceivedFriendList.length
+        return index >= listFriend.listFriend.length
             ? const BottomLoader()
-            : FriendRequests(
-                requestReceivedFriend: friendRequestReceivedList
-                    .requestReceivedFriendList[index] as RequestReceivedFriend);
-      },
-              childCount:
-                  friendRequestReceivedList.requestReceivedFriendList.length));
+            : _Friend(friend: listFriend.listFriend[index]);
+      }, childCount: listFriend.listFriend.length));
     });
   }
 }
 
-class FriendRequestList extends StatefulWidget {
-  const FriendRequestList({
+class FriendList extends StatefulWidget {
+  const FriendList({
     Key? key,
   }) : super(key: key);
 
   @override
-  State<FriendRequestList> createState() => FriendRequest();
+  State<FriendList> createState() => _FriendListState();
 }
