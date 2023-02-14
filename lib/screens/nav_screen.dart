@@ -27,7 +27,7 @@ class _NavScreenState extends State<NavScreen> with TickerProviderStateMixin{
   ];
   static final List<Widget> _screens = [
     HomeScreen(),
-    FriendScreen(),
+    RequestFriendScreen(),
     WatchTab(),
     PersonalScreen(),
     NotificationScreen(),

@@ -7,7 +7,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../blocs/request_received_friend/request_received_friend_bloc.dart';
 import '../../../blocs/request_received_friend/request_received_friend_event.dart';
 import '../../../models/request_received_friend_model.dart';
-import '../request_received_friend_screen.dart';
 
 class RequestContainer extends StatelessWidget {
   final RequestReceivedFriend requestReceivedFriend;

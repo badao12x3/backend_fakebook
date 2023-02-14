@@ -3,6 +3,7 @@ import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stream_transform/stream_transform.dart';
 
+import '../../models/list_friend_model.dart';
 import '../../repositories/friend_repository.dart';
 import 'friend_event.dart';
 import 'friend_state.dart';
@@ -29,6 +30,11 @@ class FriendBloc extends Bloc<FriendEvent, FriendState> {
       _onFriendOfAnotherUserFetched,
       transformer: throttleDroppable(throttleDuration),
     );
+
+    on<FriendDelete>(
+      _onFriendDelete,
+      transformer: throttleDroppable(throttleDuration),
+    );
   }
 
   Future<void> _onFriendFetched(
@@ -51,6 +57,25 @@ class FriendBloc extends Bloc<FriendEvent, FriendState> {
       state.listFriendState.listFriend = friendListData.listFriend;
       emit(state.copyWith(
           listFriend: state.listFriendState));
+    } catch (_) {
+      emit(state.copyWith());
+    }
+  }
+
+  Future<void> _onFriendDelete(FriendDelete event,
+      Emitter<FriendState> emit) async {
+    try {
+      final Friend friend =
+          event.friend;
+      final listData =
+      await friendRepository
+          .deleteFriends(friend.friend);
+
+      final listFriendState = state.listFriendState;
+      final listFriend = listFriendState.listFriend;
+      int index = listFriend.indexOf(friend);
+      state.listFriendState.listFriend.removeAt(index);
+      emit(FriendState(listFriendState: ListFriend(listFriend: listFriend)));
     } catch (_) {
       emit(state.copyWith());
     }
