@@ -123,7 +123,7 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
               ],
             ),
             SliverToBoxAdapter(
-                child: CreatePostContainer(currentUser: currentUser)
+                child: CreatePostContainer()
             ),
             SliverPadding(
               padding: const EdgeInsets.fromLTRB(0, 10, 0, 5),

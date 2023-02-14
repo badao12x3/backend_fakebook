@@ -22,6 +22,7 @@ import '../../blocs/personal_info/personal_info_event.dart';
 import '../../blocs/personal_post/personal_post_state.dart';
 import '../../common/widgets/bottom_loader.dart';
 import '../../models/auth_user_model.dart';
+import '../home/widgets/create_post_container.dart';
 import '../home/widgets/post_container.dart';
 
 class PersonalScreen extends StatefulWidget {
@@ -210,6 +211,18 @@ class _PersonalScreenState extends State<PersonalScreen> {
                 ),
               ),
             ),
+            if(isMe) SliverToBoxAdapter(
+              child: Container(
+                color: Colors.white,
+                padding: EdgeInsets.symmetric(horizontal: 13),
+                child: Text(
+                  "Bài viết của bạn", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+                )
+              ),
+            ),
+            if(isMe) SliverToBoxAdapter(
+                child: CreatePostContainer()
+            ),
             PersonalPostList()
           ],
           controller: _scrollController,
@@ -325,7 +338,7 @@ class NumberOfFriend extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<FriendBloc, FriendState>(builder: (context, state) {
       final listFriend = state.listFriendState;
-      return Text(listFriend.listFriend.length.toString(),
+      return Text("${listFriend.listFriend.length.toString()} người bạn",
           style: TextStyle(fontSize: 17.0, color: Colors.grey[700]));
     });
   }
