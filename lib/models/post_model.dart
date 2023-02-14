@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:equatable/equatable.dart';
 import 'package:fakebook_frontend/models/models.dart';
+// file này dùng chung cho cả PostBloc và PersonalPostBloc
 
 class PostList {
   final List<Post> posts; // không cần bỏ final vì growable: true

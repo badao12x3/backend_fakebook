@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:fakebook_frontend/models/models.dart';
 import 'package:http/http.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:stream_transform/stream_transform.dart';
 
 import 'package:fakebook_frontend/blocs/post/post_event.dart';
@@ -32,6 +33,12 @@ class PostBloc extends Bloc<PostEvent, PostState> {
     );
 
     on<PostLike>(_onLikePost);
+
+    on<PostAdd>(_onAddPost);
+
+    on<PostReport>(_onReportPost);
+
+    on<PostDelete>(_onDeletePost);
   }
 
   void _onPostReload(PostReload event, Emitter<PostState> emit) {
@@ -97,7 +104,11 @@ class PostBloc extends Bloc<PostEvent, PostState> {
   Future<void> _onLikePost(PostLike event, Emitter<PostState> emit) async {
     final mustUpdatePost = event.post;
     final posts = state.postList.posts as List<Post>;
+    // print("#PostBloc: when like in person screen: $posts");
     final indexOfMustUpdatePost = posts.indexOf(mustUpdatePost);
+    // print("#PostBloc: indexOfMustUpdatePost: $indexOfMustUpdatePost");
+    if(indexOfMustUpdatePost == -1) return;
+
     int likes = mustUpdatePost.isLiked ? mustUpdatePost.likes - 1 : mustUpdatePost.likes + 1;
     final newUpdatedPost = mustUpdatePost.copyWith(likes: likes, isLiked: !mustUpdatePost.isLiked);
     posts..remove(mustUpdatePost)..insert(indexOfMustUpdatePost, newUpdatedPost);
@@ -136,6 +147,73 @@ class PostBloc extends Bloc<PostEvent, PostState> {
       }
 
     } catch(error) {
+
+    }
+  }
+
+  Future<void> _onAddPost(PostAdd event, Emitter<PostState> emit) async {
+    final String described = event.described;
+    final String? status = event.status;
+    final List<XFile>? imageFileList = event.imageFileList;
+    try {
+      emit(state.copyWith(status: PostStatus.loading));
+      final newPost = await postRepository.addPost(described: described, status: status, imageFileList: imageFileList);
+      if (newPost != null){
+        // final AttachedVideo? videoInPost;
+        // if (newPost.video != null) {
+        //   videoInPost = AttachedVideo(url: newPost.video!.url, publicId: newPost.video!.publicId);
+        // } else {
+        //   videoInPost = null;
+        // }
+        //
+        // final newPostEmergence = Post(id: newPost.id, described: newPost.described, createdAt: newPost.createdAt,
+        //     updatedAt: newPost.updatedAt, likes: newPost.likes, comments: newPost.comments,
+        //     author: Author(id: newPost.author.id, name: newPost.author.name, avatar: newPost.author.avatar),
+        //     isLiked: newPost.isLiked, isBlocked: newPost.isBlocked, canComment: newPost.canComment, canEdit: newPost.canEdit, banned: newPost.banned,
+        //     status: newPost.status, video: videoInPost
+        // );
+        final newPostEmergence = Post.fromJson(newPost.toJson());
+        state.postList.posts.insert(0, newPostEmergence);
+        emit(
+            state.copyWith(
+              status: PostStatus.success,
+              postList: state.postList
+            )
+        );
+      }
+
+
+    } catch (_) {
+      emit(state.copyWith(status: PostStatus.failure));
+    }
+  }
+
+  Future<void> _onReportPost(PostReport event, Emitter<PostState> emit) async {
+    final String postId = event.postId;
+    final String subject = event.subject;
+    final String details = event.details;
+    try {
+      await postRepository.reportPost(postId: postId, subject: subject, details: details);
+    } catch (_) {
+
+    }
+  }
+
+  Future<void> _onDeletePost(PostDelete event, Emitter<PostState> emit) async {
+    final String postId = event.postId;
+    try {
+      final isDeleted = await postRepository.deletePost(postId: postId);
+      if(isDeleted) {
+        final posts = state.postList.posts as List<Post>;
+        final indexOfMustDeletePost = posts.indexWhere((post) => post.id == postId);
+        // print(indexOfMustDeletePost);
+        // print(state.postList.posts.length);
+        state.postList.posts.removeAt(indexOfMustDeletePost);
+        // print(state.postList.posts.length); // đã xóa rồi mà
+        // emit(state.copyWith(postList: state.postList)); // không được
+        emit(state.copyWith(postList: PostList(posts: posts, new_items: state.postList.new_items, last_id: state.postList.last_id)));
+      }
+    } catch (_) {
 
     }
   }

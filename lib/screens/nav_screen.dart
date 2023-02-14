@@ -1,12 +1,16 @@
 import 'package:fakebook_frontend/blocs/auth/auth_bloc.dart';
 import 'package:fakebook_frontend/blocs/auth/auth_event.dart';
 import 'package:fakebook_frontend/constants/assets/palette.dart';
-import 'package:fakebook_frontend/screens/friend/friend_screen.dart';
 import 'package:fakebook_frontend/screens/home/home_screen.dart';
 import 'package:fakebook_frontend/screens/menu/menu_screen.dart';
+import 'package:fakebook_frontend/screens/notification/noti_screen.dart';
+import 'package:fakebook_frontend/screens/personal/personal_screen.dart';
+import 'package:fakebook_frontend/screens/request_received_friend/request_received_friend_screen.dart';
 import 'package:fakebook_frontend/screens/watch/watch_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'notification/widgets/noti_container.dart';
 
 class NavScreen extends StatefulWidget {
   const NavScreen({Key? key}) : super(key: key);
@@ -25,14 +29,9 @@ class _NavScreenState extends State<NavScreen> with TickerProviderStateMixin{
     HomeScreen(),
     FriendScreen(),
     WatchTab(),
-    Center(
-      child: Text("It's sunny here"),
-    ),
-    Center(
-      child: Text("It's not rainy here"),
-    ),
+    PersonalScreen(),
+    NotificationScreen(),
     MenuScreen(),
-
   ];
 
   final List<Tab> _screenTabs = _icons.map((icon) => Tab(
