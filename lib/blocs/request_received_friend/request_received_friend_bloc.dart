@@ -67,7 +67,7 @@ class RequestReceivedFriendBloc
       final friendRequestReceiveds = friendRequestReceivedList.requestReceivedFriendList as List<RequestReceivedFriend>;
       int index = friendRequestReceiveds.indexOf(requestReceivedFriend);
       state.friendRequestReceivedList.requestReceivedFriendList.removeAt(index);
-      emit(RequestReceivedFriendState(friendRequestReceivedList: FriendRequestReceivedList(requestReceivedFriendList: friendRequestReceiveds)));
+      emit(RequestReceivedFriendState(friendRequestReceivedList: FriendRequestReceivedList(requestReceivedFriendList: friendRequestReceivedListData.requestReceivedFriendList)));
     } catch (_) {
       emit(state.copyWith());
     }
@@ -86,7 +86,7 @@ class RequestReceivedFriendBloc
       final friendRequestReceiveds = friendRequestReceivedList.requestReceivedFriendList as List<RequestReceivedFriend>;
       int index = friendRequestReceiveds.indexOf(requestReceivedFriend);
       state.friendRequestReceivedList.requestReceivedFriendList.removeAt(index);
-      emit(RequestReceivedFriendState(friendRequestReceivedList: FriendRequestReceivedList(requestReceivedFriendList: friendRequestReceiveds)));
+      emit(RequestReceivedFriendState(friendRequestReceivedList: FriendRequestReceivedList(requestReceivedFriendList: friendRequestReceivedListData.requestReceivedFriendList)));
     } catch (_) {
       emit(state.copyWith());
     }

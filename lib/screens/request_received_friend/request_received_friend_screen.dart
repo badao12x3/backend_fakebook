@@ -57,14 +57,12 @@ class _RequestFriendScreenContent extends State<RequestFriendScreenContent> {
               ),
             ],
           ),
-          SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
-            sliver: SliverToBoxAdapter(
+          SliverToBoxAdapter(
               child: Container(
                   color: Colors.white,
                   child: Row(children: [
                     Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 0, 2, 0),
+                        padding: const EdgeInsets.fromLTRB(12, 0, 2, 0),
                         child: OutlinedButton(
                           style: ButtonStyle(
                               foregroundColor: MaterialStateProperty.all<Color>(
@@ -97,12 +95,10 @@ class _RequestFriendScreenContent extends State<RequestFriendScreenContent> {
                           },
                           child: Text('Tất cả bạn bè'),
                         )),
-                  ])),
+                  ]),
             ),
           ),
-          SliverPadding(
-            padding: const EdgeInsets.fromLTRB(0, 10, 0, 5),
-            sliver: SliverToBoxAdapter(
+          SliverToBoxAdapter(
               child: Container(
                   color: Colors.white,
                   child: Padding(
@@ -116,7 +112,7 @@ class _RequestFriendScreenContent extends State<RequestFriendScreenContent> {
                                   fontSize: 20, fontWeight: FontWeight.bold)),
                           NumberOfFriendRequests(),
                         ],
-                      ))),
+                      )),
             ),
           ),
           FriendRequestList(),
