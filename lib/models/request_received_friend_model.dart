@@ -74,6 +74,5 @@ class RequestReceivedFriend extends Equatable{
       };
 
   @override
-  // TODO: implement props
   List<Object?> get props => [fromUser, name, avatar, createdAt];
 }

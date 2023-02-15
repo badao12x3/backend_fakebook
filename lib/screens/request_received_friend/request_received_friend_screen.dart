@@ -74,7 +74,9 @@ class _RequestFriendScreenContent extends State<RequestFriendScreenContent> {
                                   RoundedRectangleBorder(
                                       borderRadius:
                                           BorderRadius.circular(18.0)))),
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.pushNamed(context, Routes.unknow_people_screen);
+                          },
                           child: Text('Gợi ý'),
                         )),
                     Padding(

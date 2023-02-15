@@ -1,37 +1,38 @@
 import 'package:fakebook_frontend/common/widgets/common_widgets.dart';
 import 'package:fakebook_frontend/models/list_friend_model.dart';
 import 'package:fakebook_frontend/screens/request_received_friend/sub_screens/widgets/friend_container.dart';
-import 'package:fakebook_frontend/screens/request_received_friend/widgets/request_container.dart';
+import 'package:fakebook_frontend/screens/request_received_friend/sub_screens/widgets/unknown_person_container.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../blocs/friend/friend_bloc.dart';
-import '../../../blocs/friend/friend_event.dart';
-import '../../../blocs/friend/friend_state.dart';
-import '../../../blocs/request_received_friend/request_received_friend_bloc.dart';
-import '../../../blocs/request_received_friend/request_received_friend_state.dart';
-import '../../../models/request_received_friend_model.dart';
+import '../../../blocs/unknow_people/unknow_people_bloc.dart';
+
+import '../../../blocs/unknow_people/unknow_people_event.dart';
+import '../../../blocs/unknow_people/unknow_people_state.dart';
+import '../../../models/list_unknown_people_model.dart';
 import '../../../routes.dart';
 
-class FriendScreen extends StatelessWidget {
+class UnknowPeopleScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    BlocProvider.of<FriendBloc>(context).add(FriendFetched());
-    return FriendScreenContent();
+    BlocProvider.of<ListUnknownPeopleBloc>(context).add(ListUnknownPeopleFetched());
+    return UnknowPeopleScreenContent();
   }
 }
 
-class FriendScreenContent extends StatefulWidget {
-  const FriendScreenContent({
+class UnknowPeopleScreenContent extends StatefulWidget {
+  const UnknowPeopleScreenContent({
     Key? key,
   }) : super(key: key);
 
   @override
-  State<FriendScreenContent> createState() => _FriendScreenContent();
+  State<UnknowPeopleScreenContent> createState() =>
+      _UnknowPeopleScreenContent();
 }
 
-class _FriendScreenContent extends State<FriendScreenContent> {
+class _UnknowPeopleScreenContent extends State<UnknowPeopleScreenContent> {
   @override
   Widget build(BuildContext context) {
     print("#POST OBSERVER: Rebuild");
@@ -83,10 +84,8 @@ class _FriendScreenContent extends State<FriendScreenContent> {
                                           BorderRadius.circular(18.0)))),
                       onPressed: () {
                         Navigator.pop(context);
-                        Navigator.pushNamed(
-                            context, Routes.unknow_people_screen);
                       },
-                      child: Text('Gợi ý'),
+                      child: Text('Lời mời kết bạn'),
                     )),
                 Padding(
                     padding: const EdgeInsets.fromLTRB(2, 0, 0, 0),
@@ -103,8 +102,9 @@ class _FriendScreenContent extends State<FriendScreenContent> {
                                           BorderRadius.circular(18.0)))),
                       onPressed: () {
                         Navigator.pop(context);
+                        Navigator.pushNamed(context, Routes.friend_screen);
                       },
-                      child: Text('Lời mời kết bạn'),
+                      child: Text('Tất cả bạn bè'),
                     )),
               ]),
             ),
@@ -118,38 +118,22 @@ class _FriendScreenContent extends State<FriendScreenContent> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: const [
-                        Text("Danh sách bạn bè   ",
+                        Text("Danh sách người bạn có thể biết:",
                             style: TextStyle(fontSize: 20)),
-                        NumberOfFriend(),
                       ],
                     ))),
           ),
-          FriendList(),
+          ListUnknownPeopleList(),
         ],
       ),
     );
   }
 }
 
-class NumberOfFriend extends StatelessWidget {
-  const NumberOfFriend({
-    Key? key,
-  }) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<FriendBloc, FriendState>(builder: (context, state) {
-      final listFriend = state.listFriendState;
-      return Text(listFriend.listFriend.length.toString(),
-          style: const TextStyle(
-              fontSize: 20, fontWeight: FontWeight.bold, color: Colors.red));
-    });
-  }
-}
-
-class _Friend extends StatelessWidget {
-  final Friend friend;
-  const _Friend({Key? key, required this.friend}) : super(key: key);
+class _UnknownPerson extends StatelessWidget {
+  final UnknownPerson unknownPerson;
+  const _UnknownPerson({Key? key, required this.unknownPerson}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -163,7 +147,7 @@ class _Friend extends StatelessWidget {
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Padding(
                   padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
-                  child: FriendContainer(friend: friend)),
+                  child: UnknownPersonContainer(unknownPerson: unknownPerson)),
             ]),
           ),
         ],
@@ -172,26 +156,26 @@ class _Friend extends StatelessWidget {
   }
 }
 
-class _FriendListState extends State<FriendList> {
+class _ListUnknownPeopleListState extends State<ListUnknownPeopleList> {
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<FriendBloc, FriendState>(builder: (context, state) {
-      final listFriend = state.listFriendState;
+    return BlocBuilder<ListUnknownPeopleBloc, ListUnknownPeopleState>(builder: (context, state) {
+      final listUnknownPeople = state.listUnknownPeopleState;
       return SliverList(
           delegate: SliverChildBuilderDelegate((context, index) {
-        return index >= listFriend.listFriend.length
+        return index >= listUnknownPeople.listUnknownPeople.length
             ? const BottomLoader()
-            : _Friend(friend: listFriend.listFriend[index]);
-      }, childCount: listFriend.listFriend.length));
+            : _UnknownPerson(unknownPerson: listUnknownPeople.listUnknownPeople[index]);
+      }, childCount: listUnknownPeople.listUnknownPeople.length));
     });
   }
 }
 
-class FriendList extends StatefulWidget {
-  const FriendList({
+class ListUnknownPeopleList extends StatefulWidget {
+  const ListUnknownPeopleList({
     Key? key,
   }) : super(key: key);
 
   @override
-  State<FriendList> createState() => _FriendListState();
+  State<ListUnknownPeopleList> createState() => _ListUnknownPeopleListState();
 }

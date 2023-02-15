@@ -43,7 +43,7 @@ class FriendBloc extends Bloc<FriendEvent, FriendState> {
       final friendListData = await friendRepository.friendsFetch();
       state.listFriendState.listFriend = friendListData.listFriend;
       emit(state.copyWith(
-          listFriend: state.listFriendState));
+          listFriend: friendListData));
     } catch (_) {
       emit(state.copyWith());
     }
@@ -67,7 +67,7 @@ class FriendBloc extends Bloc<FriendEvent, FriendState> {
     try {
       final Friend friend =
           event.friend;
-      final listData =
+      final friendListData =
       await friendRepository
           .deleteFriends(friend.friend);
 
