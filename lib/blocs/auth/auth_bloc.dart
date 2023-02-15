@@ -1,4 +1,4 @@
-import 'dart:convert';
+  import 'dart:convert';
 
 import 'package:bloc/bloc.dart';
 import 'package:fakebook_frontend/blocs/auth/auth_event.dart';
