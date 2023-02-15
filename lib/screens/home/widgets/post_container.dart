@@ -24,7 +24,7 @@ class PostContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print("#PostContainer: Rebuild ${post.id}");
+    // print("#PostContainer: Rebuild ${post.id}");
 
     // tính timeAgo
     DateTime dt1 = DateTime.now();
@@ -32,12 +32,13 @@ class PostContainer extends StatelessWidget {
     final Duration diff = dt1.difference(dt2);
     final String timeAgo = diff.inDays == 0 ? "${diff.inHours}h" : "${diff.inDays}d";
 
-    void handleLikePost() {
+    Future<void> handleLikePost() async {
       // print("#PostContainer: Like post: ${post.id}");
       // Bị vấn đề là dùng chung PostContainer và khi state của 1 trong 2 cái chưa load hết mà update thì sẽ khả năng lỗi mảng cao
       // Đã sửa bằng cách fix if(indexOfMustUpdatePost == -1) return; ---> nhưng chỉ update được 1 trong 2 cái, 1 cái còn lại luôn báo lỗi không thấy mảng -1 dù cả 2 đã load hết state ---> Tạm chấp nhận được
-      BlocProvider.of<PostBloc>(context).add(PostLike(post: post));
-      BlocProvider.of<PersonalPostBloc>(context).add(PersonalPostLike(post: post));
+      BlocProvider.of<PostBloc>(context).add(PostLike(post: post)); // 21:32:03:066 mất 507mss
+      await Future.delayed(const Duration(milliseconds: 500)); // fix lỗi tăng 2 like do gửi bất đồng bộ 21:40:46:096 OK -- trừ đi (> 500ms??? là) 21:40:46.601 Fail
+      BlocProvider.of<PersonalPostBloc>(context).add(PersonalPostLike(post: post)); // 21:32:03:201 mất 492ms
     }
 
     void handleOtherPostEvent(Map event) {

@@ -79,12 +79,15 @@ class _PersonalScreenState extends State<PersonalScreen> {
 
   @override
   Widget build(BuildContext context) {
+    print("#!#0PersonalScreen: Rebuild");
     context.read<PersonalPostBloc>().add(PersonalPostReload(accountId: userId));
     context
         .read<PersonalPostBloc>()
         .add(PersonalPostFetched(accountId: userId));
     if (isMe) {
+      print("#!#1Bắt đầu gọi bất đồng bộ");
       context.read<PersonalInfoBloc>().add(PersonalInfoFetched());
+      print("#!#2Chưa thực hiện xong PersonalInfoFetched() mà gọi tiếp FriendFetched()");
       context.read<FriendBloc>().add(FriendFetched());
     } else {
       context
@@ -94,7 +97,7 @@ class _PersonalScreenState extends State<PersonalScreen> {
           .read<FriendBloc>()
           .add(FriendOfAnotherUserFetched(id: accountId.toString()));
     }
-
+    print("#!#3Bắt đầu render UI");
     return Scaffold(
       appBar: AppBar(
           backgroundColor: Colors.white,
@@ -277,7 +280,7 @@ class Avatar extends StatelessWidget {
           },
           child: CircleAvatar(
             radius: 80.0,
-            backgroundImage: CachedNetworkImageProvider(userInfo.avatar),
+            backgroundImage: CachedNetworkImageProvider(userInfo.avatar!="" ? userInfo.avatar : "http://dummyimage.com/100x100.png/ff4444/ffffff"),
           ),
         ),
       );
@@ -301,7 +304,7 @@ class CoverImage extends StatelessWidget {
           height: 210.0,
           decoration: BoxDecoration(
               image: DecorationImage(
-            image: CachedNetworkImageProvider(userInfo.coverImage),
+            image: CachedNetworkImageProvider(userInfo.coverImage!="" ? userInfo.coverImage : "http://dummyimage.com/100x100.png/ff4444/ffffff"),
             fit: BoxFit.cover,
           )),
         ),

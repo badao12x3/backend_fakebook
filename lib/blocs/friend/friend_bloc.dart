@@ -84,12 +84,12 @@ class FriendBloc extends Bloc<FriendEvent, FriendState> {
   @override
   void onError(Object error, StackTrace stackTrace) {
     super.onError(error, stackTrace);
-    print('#POST OBSERVER: $error');
+    // print('#FRIEND BLOC OBSERVER: $error');
   }
 
   @override
   void onEvent(FriendEvent event) {
     super.onEvent(event);
-    print('#POST OBSERVER 123: $event');
+    // print('#FRIEND BLOC OBSERVER: $event');
   }
 }

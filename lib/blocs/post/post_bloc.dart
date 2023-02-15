@@ -104,9 +104,10 @@ class PostBloc extends Bloc<PostEvent, PostState> {
   Future<void> _onLikePost(PostLike event, Emitter<PostState> emit) async {
     final mustUpdatePost = event.post;
     final posts = state.postList.posts as List<Post>;
-    // print("#PostBloc: when like in person screen: $posts");
+    print("#PostBloc: when like in person screen: $posts");
+    print("#PostBloc: when like in person screen: $mustUpdatePost");
     final indexOfMustUpdatePost = posts.indexOf(mustUpdatePost);
-    // print("#PostBloc: indexOfMustUpdatePost: $indexOfMustUpdatePost");
+    print("#PostBloc: indexOfMustUpdatePost: $indexOfMustUpdatePost");
     if(indexOfMustUpdatePost == -1) return;
 
     int likes = mustUpdatePost.isLiked ? mustUpdatePost.likes - 1 : mustUpdatePost.likes + 1;

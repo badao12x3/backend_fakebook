@@ -48,7 +48,7 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
   @override
   void onError(Object error, StackTrace stackTrace) {
     super.onError(error, stackTrace);
-    print('#COMMENT OBSERVER: $error');
+    // print('#COMMENT OBSERVER: $error');
   }
 
   @override
@@ -60,13 +60,13 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
   @override
   void onEvent(CommentEvent event) {
     super.onEvent(event);
-    print('#COMMENT OBSERVER: $event');
+    // print('#COMMENT OBSERVER: $event');
   }
 
   @override
   void onChange(Change<CommentState> change) {
     super.onChange(change);
-    print('#COMMENT OBSERVER: { stateCurrent: ${change.currentState.comments?.length ?? 0}, statusCurrent: ${change.currentState.commentStatus} }');
-    print('#COMMENT OBSERVER: { stateNext: ${change.nextState.comments?.length ?? 0}, statusNext: ${change.nextState.commentStatus} }');
+    // print('#COMMENT OBSERVER: { stateCurrent: ${change.currentState.comments?.length ?? 0}, statusCurrent: ${change.currentState.commentStatus} }');
+    // print('#COMMENT OBSERVER: { stateNext: ${change.nextState.comments?.length ?? 0}, statusNext: ${change.nextState.commentStatus} }');
   }
 }

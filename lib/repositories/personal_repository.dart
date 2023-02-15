@@ -11,6 +11,7 @@ import '../models/personal_modal.dart';
 
 class UserInfoRepository {
   Future<UserInfo> fetchPersonalInfo() async {
+    print("#!#4Bắt đầu thực hiện fetchPersonalInfo()");
     final url =
         Uri.http(Configuration.baseUrlConnect, '/account/get_user_info');
 
@@ -21,7 +22,7 @@ class UserInfoRepository {
     final token = userMap['token'] != 'No userdata'
         ? userMap['token']
         : Configuration.token;
-    print(url);
+
     final response = await http.get(url, headers: {
       HttpHeaders.authorizationHeader: token,
     });
@@ -30,6 +31,7 @@ class UserInfoRepository {
         {
           final body = json.decode(response.body) as Map<String, dynamic>;
           final userInfo = UserInfo.fromJson(body);
+          print("#!#7Kết thúc thực hiện xong fetchPersonalInfo()");
           return userInfo;
         }
       case 400:

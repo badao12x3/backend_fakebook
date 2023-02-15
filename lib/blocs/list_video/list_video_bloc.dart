@@ -76,7 +76,7 @@ class ListVideoBloc extends Bloc<ListVideoEvent, ListVideoState> {
   @override
   void onError(Object error, StackTrace stackTrace) {
     super.onError(error, stackTrace);
-    print('#VIDEO OBSERVER: $error');
+    // print('#VIDEO OBSERVER: $error');
   }
 
   @override
@@ -88,13 +88,13 @@ class ListVideoBloc extends Bloc<ListVideoEvent, ListVideoState> {
   @override
   void onEvent(ListVideoEvent event) {
     super.onEvent(event);
-    print('#VIDEO OBSERVER: $event');
+    // print('#VIDEO OBSERVER: $event');
   }
 
   @override
   void onChange(Change<ListVideoState> change) {
     super.onChange(change);
-    print('#VIDEO OBSERVER: { stateCurrent: ${change.currentState.videoList.videos.length}, statusCurrent: ${change.currentState.status} }');
-    print('#VIDEO OBSERVER: { stateNext: ${change.nextState.videoList.videos.length}, statusNext: ${change.nextState.status}}');
+    // print('#VIDEO OBSERVER: { stateCurrent: ${change.currentState.videoList.videos.length}, statusCurrent: ${change.currentState.status} }');
+    // print('#VIDEO OBSERVER: { stateNext: ${change.nextState.videoList.videos.length}, statusNext: ${change.nextState.status}}');
   }
 }

@@ -58,12 +58,18 @@ class PersonalInfoBloc extends Bloc<PersonalInfoEvent, PersonalInfoState> {
   @override
   void onError(Object error, StackTrace stackTrace) {
     super.onError(error, stackTrace);
-    print('#POST OBSERVER: $error');
+    // print('#PERSONAL INFO OBSERVER: $error');
   }
 
   @override
   void onEvent(PersonalInfoEvent event) {
     super.onEvent(event);
-    print('#POST OBSERVER 123: $event');
+    print('#PERSONAL INFO OBSERVER: $event');
+  }
+
+  @override
+  void onChange(Change<PersonalInfoState> change) {
+    super.onChange(change);
+    print('#PERSONAL INFO OBSERVER: ${change.currentState} ---> ${change.nextState}' );
   }
 }

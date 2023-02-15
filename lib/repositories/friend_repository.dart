@@ -11,6 +11,7 @@ import '../models/list_friend_model.dart';
 
 class FriendRepository {
   Future<ListFriend> friendsFetch() async {
+    print("#!#5Bắt đầu thực hiện friendsFetch()");
     final url =
         Uri.http(Configuration.baseUrlConnect, '/account/get_list_friends');
 
@@ -29,6 +30,7 @@ class FriendRepository {
         {
           final body = json.decode(response.body) as Map<String, dynamic>;
           final friendList = ListFriend.fromJson(body);
+          print("#!#6Kết thúc thực hiện xong friendsFetch()");
           return friendList;
         }
       case 400:

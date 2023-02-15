@@ -70,7 +70,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   @override
   void onError(Object error, StackTrace stackTrace) {
     super.onError(error, stackTrace);
-    print('#AUTH OBSERVER: $error');
+    // print('#AUTH OBSERVER: $error');
   }
 
   @override
@@ -82,13 +82,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   @override
   void onEvent(AuthEvent event) {
     super.onEvent(event);
-    print('#AUTH OBSERVER: $event');
+    // print('#AUTH OBSERVER: $event');
   }
 
   @override
   void onChange(Change<AuthState> change) {
     super.onChange(change);
-    print('#AUTH OBSERVER: { stateCurrent:  statusCurrent: ${change.currentState.status}, authUserCurrent: ${change.currentState.authUser} }');
-    print('#AUTH OBSERVER: { stateNext:  statusNext: ${change.nextState.status}, authUserNext: ${change.nextState.authUser} }');
+    // print('#AUTH OBSERVER: { stateCurrent:  statusCurrent: ${change.currentState.status}, authUserCurrent: ${change.currentState.authUser} }');
+    // print('#AUTH OBSERVER: { stateNext:  statusNext: ${change.nextState.status}, authUserNext: ${change.nextState.authUser} }');
   }
 }

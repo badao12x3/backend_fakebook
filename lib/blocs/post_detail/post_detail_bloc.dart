@@ -26,7 +26,7 @@ class PostDetailBloc extends Bloc<PostDetailEvent, PostDetailState> {
   @override
   void onError(Object error, StackTrace stackTrace) {
     super.onError(error, stackTrace);
-    print('#POST_DETAIL OBSERVER: $error');
+    // print('#POST_DETAIL OBSERVER: $error');
   }
 
   @override
@@ -38,12 +38,12 @@ class PostDetailBloc extends Bloc<PostDetailEvent, PostDetailState> {
   @override
   void onEvent(PostDetailEvent event) {
     super.onEvent(event);
-    print('#POST_DETAIL OBSERVER: $event');
+    // print('#POST_DETAIL OBSERVER: $event');
   }
 
   @override
   void onChange(Change<PostDetailState> change) {
     super.onChange(change);
-    print('#POST_DETAIL OBSERVER: ${change.currentState} ---> ${change.nextState}' );
+    // print('#POST_DETAIL OBSERVER: ${change.currentState} ---> ${change.nextState}' );
   }
 }

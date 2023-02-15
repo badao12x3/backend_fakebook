@@ -65,7 +65,7 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
 
   @override
   Widget build(BuildContext context) {
-    print("#POST OBSERVER: Rebuild");
+    print("#HomeScreen: Rebuild");
     return RefreshIndicator(
       color: Colors.blue,
       backgroundColor: Colors.white,

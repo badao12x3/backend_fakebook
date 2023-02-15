@@ -98,10 +98,10 @@ class PersonalPostBloc extends Bloc<PersonalPostEvent, PersonalPostState> {
     final mustUpdatePost = event.post;
     final posts = state.postList.posts as List<Post>;
     // lí do một trong 2 cái là -1 là: 1. updatedAt thay đổi, 2. likes thay đổi ---> logic phức tạp --> tạm thời chấp nhận
-    // print("#PersonalPostBloc: when like in home screen: $posts");
-    // print("#PersonalPostBloc: when like in home screen: $mustUpdatePost");
+    print("#PersonalPostBloc: when like in home screen: $posts");
+    print("#PersonalPostBloc: when like in home screen: $mustUpdatePost");
     final indexOfMustUpdatePost = posts.indexOf(mustUpdatePost);
-    // print("#PersonalPostBloc: indexOfMustUpdatePost: $indexOfMustUpdatePost");
+    print("#PersonalPostBloc: indexOfMustUpdatePost: $indexOfMustUpdatePost");
     if(indexOfMustUpdatePost == -1) return;
 
     int likes = mustUpdatePost.isLiked ? mustUpdatePost.likes - 1 : mustUpdatePost.likes + 1;
