@@ -109,6 +109,7 @@ class _PersonalScreenState extends State<PersonalScreen> {
                   : IconButton(
                       onPressed: () {
                         Navigator.of(context).pop();
+                        context.read<PersonalInfoBloc>().add(PersonalInfoFetched());
                       },
                       icon: Icon(Icons.arrow_back_ios, color: Colors.black));
             },
@@ -153,6 +154,7 @@ class _PersonalScreenState extends State<PersonalScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     UserName(),
+                    Description(),
                     const SizedBox(height: 15.0),
                     GestureDetector(
                       onTap: () {
@@ -263,6 +265,20 @@ class UserName extends StatelessWidget {
     });
   }
 }
+
+class Description extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<PersonalInfoBloc, PersonalInfoState>(
+        builder: (context, state) {
+          final userInfo = state.userInfo;
+          return Text(userInfo.description,
+              textAlign: TextAlign.left,
+              style: const TextStyle(fontSize: 12.0, fontStyle: FontStyle.italic));
+        });
+  }
+}
+
 
 class Avatar extends StatelessWidget {
   @override

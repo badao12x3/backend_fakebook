@@ -29,6 +29,23 @@ class PersonalInfoBloc extends Bloc<PersonalInfoEvent, PersonalInfoState> {
       _onPersonalInfoOfAnotherUserFerched,
       transformer: throttleDroppable(throttleDuration),
     );
+
+    on<SetNameUser>(
+      _onSetNameUser,
+      transformer: throttleDroppable(throttleDuration),
+    );
+    on<SetDescriptionUser>(
+      _onSetDescriptionUser,
+      transformer: throttleDroppable(throttleDuration),
+    );
+    on<SetCityUser>(
+      _onSetCityUser,
+      transformer: throttleDroppable(throttleDuration),
+    );
+    on<SetCountryUser>(
+      _onSetCountryUser,
+      transformer: throttleDroppable(throttleDuration),
+    );
   }
 
   Future<void> _onPersonalInfoFetched(
@@ -54,6 +71,46 @@ class PersonalInfoBloc extends Bloc<PersonalInfoEvent, PersonalInfoState> {
     }
   }
 
+  Future<void> _onSetNameUser(
+      SetNameUser event, Emitter<PersonalInfoState> emit) async {
+    try {
+      final String name = event.name;
+      await userInfoRepository.setNameUser(name);
+    } catch (_) {
+      emit(state.copyWith());
+    }
+  }
+
+  Future<void> _onSetDescriptionUser(
+      SetDescriptionUser event, Emitter<PersonalInfoState> emit) async {
+    try {
+      final String description = event.description;
+      await userInfoRepository.setDescriptionUser(description);
+    } catch (_) {
+      emit(state.copyWith());
+    }
+  }
+
+
+  Future<void> _onSetCityUser(
+      SetCityUser event, Emitter<PersonalInfoState> emit) async {
+    try {
+      final String city = event.city;
+      await userInfoRepository.setCityUser(city);
+    } catch (_) {
+      emit(state.copyWith());
+    }
+  }
+
+  Future<void> _onSetCountryUser(
+      SetCountryUser event, Emitter<PersonalInfoState> emit) async {
+    try {
+      final String country = event.country;
+      await userInfoRepository.setCountryUser(country);
+    } catch (_) {
+      emit(state.copyWith());
+    }
+  }
 
   @override
   void onError(Object error, StackTrace stackTrace) {
@@ -70,6 +127,7 @@ class PersonalInfoBloc extends Bloc<PersonalInfoEvent, PersonalInfoState> {
   @override
   void onChange(Change<PersonalInfoState> change) {
     super.onChange(change);
-    print('#PERSONAL INFO OBSERVER: ${change.currentState} ---> ${change.nextState}' );
+    print(
+        '#PERSONAL INFO OBSERVER: ${change.currentState} ---> ${change.nextState}');
   }
 }

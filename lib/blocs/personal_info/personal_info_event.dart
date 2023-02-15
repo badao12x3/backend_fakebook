@@ -11,3 +11,22 @@ class PersonalInfoOfAnotherUserFerched extends PersonalInfoEvent {
   final String id;
   PersonalInfoOfAnotherUserFerched({required this.id});
 }
+
+class SetNameUser extends PersonalInfoEvent {
+  final String name;
+  SetNameUser({required this.name});
+}
+
+class SetDescriptionUser extends PersonalInfoEvent {
+  final String description;
+  SetDescriptionUser({required this.description});
+}
+class SetCityUser extends PersonalInfoEvent {
+  final String city;
+  SetCityUser({required this.city});
+}
+class SetCountryUser extends PersonalInfoEvent {
+  final String country;
+  SetCountryUser({required this.country});
+}
+

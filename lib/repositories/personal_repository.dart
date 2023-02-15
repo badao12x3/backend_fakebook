@@ -43,7 +43,7 @@ class UserInfoRepository {
 
   Future<UserInfo> fetchPersonalInfoOfAnotherUser(String id) async {
     final url =
-    Uri.http(Configuration.baseUrlConnect, '/account/get_user_info',{
+        Uri.http(Configuration.baseUrlConnect, '/account/get_user_info', {
       'user_id': id,
     });
 
@@ -54,12 +54,10 @@ class UserInfoRepository {
         ? userMap['token']
         : Configuration.token;
 
-    final response = await http.get(url,
-        headers: <String, String>{
-          HttpHeaders.authorizationHeader: token,
-          'Content-Type': 'application/json; charset=UTF-8',
-        }
-    );
+    final response = await http.get(url, headers: <String, String>{
+      HttpHeaders.authorizationHeader: token,
+      'Content-Type': 'application/json; charset=UTF-8',
+    });
     switch (response.statusCode) {
       case 200:
         {
@@ -72,5 +70,81 @@ class UserInfoRepository {
       default:
         throw Exception('Error fetchRequestReceivedFriends');
     }
+  }
+
+  Future<void> setNameUser(String name) async {
+    final url =
+        Uri.http(Configuration.baseUrlConnect, '/account/set_user_info');
+
+    final prefs = await SharedPreferences.getInstance();
+    String userPref = prefs.getString('user') ?? '{"token": "No userdata"}';
+    Map<String, dynamic> userMap = jsonDecode(userPref) as Map<String, dynamic>;
+    final token = userMap['token'] != 'No userdata'
+        ? userMap['token']
+        : Configuration.token;
+
+    final response = await http.post(url,
+        headers: <String, String>{
+          HttpHeaders.authorizationHeader: token,
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, dynamic>{'username': name}));
+  }
+
+  Future<void> setDescriptionUser(String description) async {
+    final url =
+        Uri.http(Configuration.baseUrlConnect, '/account/set_user_info');
+
+    final prefs = await SharedPreferences.getInstance();
+    String userPref = prefs.getString('user') ?? '{"token": "No userdata"}';
+    Map<String, dynamic> userMap = jsonDecode(userPref) as Map<String, dynamic>;
+    final token = userMap['token'] != 'No userdata'
+        ? userMap['token']
+        : Configuration.token;
+
+    final response = await http.post(url,
+        headers: <String, String>{
+          HttpHeaders.authorizationHeader: token,
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, dynamic>{'description': description}));
+  }
+
+  Future<void> setCityUser(String city) async {
+    final url =
+        Uri.http(Configuration.baseUrlConnect, '/account/set_user_info');
+
+    final prefs = await SharedPreferences.getInstance();
+    String userPref = prefs.getString('user') ?? '{"token": "No userdata"}';
+    Map<String, dynamic> userMap = jsonDecode(userPref) as Map<String, dynamic>;
+    final token = userMap['token'] != 'No userdata'
+        ? userMap['token']
+        : Configuration.token;
+
+    final response = await http.post(url,
+        headers: <String, String>{
+          HttpHeaders.authorizationHeader: token,
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, dynamic>{'city': city}));
+  }
+
+  Future<void> setCountryUser(String country) async {
+    final url =
+        Uri.http(Configuration.baseUrlConnect, '/account/set_user_info');
+
+    final prefs = await SharedPreferences.getInstance();
+    String userPref = prefs.getString('user') ?? '{"token": "No userdata"}';
+    Map<String, dynamic> userMap = jsonDecode(userPref) as Map<String, dynamic>;
+    final token = userMap['token'] != 'No userdata'
+        ? userMap['token']
+        : Configuration.token;
+
+    final response = await http.post(url,
+        headers: <String, String>{
+          HttpHeaders.authorizationHeader: token,
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, dynamic>{'country': country}));
   }
 }

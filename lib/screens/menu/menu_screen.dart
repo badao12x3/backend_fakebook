@@ -13,15 +13,18 @@ import 'package:fakebook_frontend/screens/menu/widgets/menu_widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../blocs/personal_info/personal_info_bloc.dart';
+import '../../blocs/personal_info/personal_info_event.dart';
+import '../../blocs/personal_info/personal_info_state.dart';
+
 class MenuScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Future<void> handleLogout() async {
-      // Bởi vì cập nhật trạng thái AuthState, nên không cần thiết pop. Nếu cố tình dùng pop sẽ mất context
-      // Navigator.popAndPushNamed(context, Routes.login_screen); // Nếu pop thuần thì ra màn hình đen sì
+      context
+          .read<PersonalInfoBloc>();
       BlocProvider.of<AuthBloc>(context).add(Logout());
       // dù câu lệnh ở đằng sau nhưng vì là bất đồng bộ nên vẫn là AuthStatus.authenticated
-      final user = BlocProvider.of<AuthBloc>(context).state.status;
       // print("Logout getUser: " + user.toString());
     }
     return Scaffold(
@@ -57,17 +60,13 @@ class MenuScreen extends StatelessWidget {
                     onPressed: () => print('See profile'),
                     child: Row(
                       children: [
-                        ProfileAvatar(imageUrl: currentUser.imageUrl),
+                        Avatar(),
                         const SizedBox(width: 12.0),
                         Expanded(
                             child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(currentUser.name,
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 18.0,
-                                      color: Colors.black)),
+                              UserName(),
                               const Text(
                                 'See your profile',
                                 style: TextStyle(color: Palette.facebookBlue),
@@ -156,5 +155,33 @@ class MenuScreen extends StatelessWidget {
           )
         ],
     ));
+  }
+}
+
+class UserName extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<PersonalInfoBloc, PersonalInfoState>(
+        builder: (context, state) {
+          final userInfo = state.userInfo;
+          return Text(userInfo.name,
+              style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18.0,
+                  color: Colors.black));
+        });
+  }
+}
+
+class Avatar extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    context.read<PersonalInfoBloc>().add(PersonalInfoFetched());
+
+    return BlocBuilder<PersonalInfoBloc, PersonalInfoState>(
+        builder: (context, state) {
+          final userInfo = state.userInfo;
+          return ProfileAvatar(imageUrl: userInfo.avatar);
+        });
   }
 }

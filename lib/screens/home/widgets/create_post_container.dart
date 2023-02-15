@@ -3,8 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 import 'package:fakebook_frontend/models/local/models.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../blocs/personal_info/personal_info_bloc.dart';
+import '../../../blocs/personal_info/personal_info_event.dart';
+import '../../../blocs/personal_info/personal_info_state.dart';
 import '../../../constants/localdata/user_data.dart';
+import '../../personal/widgets/avatar_bottom_sheet.dart';
 
 class CreatePostContainer extends StatelessWidget {
   const CreatePostContainer({Key? key}): super(key: key);
@@ -20,11 +25,7 @@ class CreatePostContainer extends StatelessWidget {
         children: [
           Row(
             children: [
-              CircleAvatar(
-                radius: 20.0,
-                backgroundColor: Colors.grey[200],
-                backgroundImage: CachedNetworkImageProvider(currentUser.imageUrl),
-              ),
+              Avatar(),
               const SizedBox(width: 10.0),
               Expanded(
                 child: InkWell(
@@ -36,7 +37,7 @@ class CreatePostContainer extends StatelessWidget {
                   ),
                 ),
               ),
-              TextButton.icon(
+              TextButton. icon(
                   onPressed: () {print("image");},
                   icon: Icon(Icons.photo_library, color: Colors.green),
                   label: Text('Photos'),
@@ -46,5 +47,21 @@ class CreatePostContainer extends StatelessWidget {
         ]
       ),
     );
+  }
+}
+
+class Avatar extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    context.read<PersonalInfoBloc>().add(PersonalInfoFetched());
+    return BlocBuilder<PersonalInfoBloc, PersonalInfoState>(
+        builder: (context, state) {
+          final userInfo = state.userInfo;
+          return CircleAvatar(
+            radius: 20.0,
+            backgroundColor: Colors.grey[200],
+            backgroundImage: CachedNetworkImageProvider(userInfo.avatar),
+          );
+        });
   }
 }
