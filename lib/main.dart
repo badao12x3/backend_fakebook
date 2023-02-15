@@ -19,6 +19,7 @@ import 'package:fakebook_frontend/configuration.dart';
 import 'package:fakebook_frontend/screens/personal/personal_screen.dart';
 import 'package:fakebook_frontend/screens/post/emotion_screen.dart';
 import 'package:fakebook_frontend/screens/request_received_friend/sub_screens/list_friend_screen.dart';
+import 'package:fakebook_frontend/screens/request_received_friend/sub_screens/unknown_people_screen.dart';
 import 'package:fakebook_frontend/simple_bloc_observer.dart';
 import 'package:flutter/material.dart';
 
@@ -30,6 +31,7 @@ import './screens/screens.dart';
 import 'blocs/personal_info/personal_info_bloc.dart';
 import 'blocs/post/post_bloc.dart';
 import 'blocs/request_received_friend/request_received_friend_bloc.dart';
+import 'blocs/unknow_people/unknow_people_bloc.dart';
 
 
 void main() async{
@@ -84,6 +86,10 @@ class MyApp extends StatelessWidget {
         BlocProvider<FriendBloc>(
           lazy: false,
           create: (_) => FriendBloc(),
+        ),
+        BlocProvider<ListUnknownPeopleBloc>(
+          lazy: false,
+          create: (_) => ListUnknownPeopleBloc(),
         )
       ],
       child: MaterialApp(
@@ -131,6 +137,9 @@ class MyApp extends StatelessWidget {
               }
               case Routes.friend_screen: {
                 return MaterialPageRoute(builder: (_) => FriendScreen());
+              }
+              case Routes.unknow_people_screen: {
+                return MaterialPageRoute(builder: (_) => UnknowPeopleScreen());
               }
               default:
                 return MaterialPageRoute(builder: (_) => NavScreen());

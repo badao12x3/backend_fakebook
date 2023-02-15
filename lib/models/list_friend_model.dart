@@ -1,9 +1,12 @@
+import 'package:equatable/equatable.dart';
+
 class ListFriend {
+  List<Friend> listFriend;
+
   ListFriend({
     required this.listFriend,
   });
 
-  List<Friend> listFriend;
 
   ListFriend.initial() : listFriend = List<Friend>.empty(growable: true);
 
@@ -24,7 +27,7 @@ class ListFriend {
       };
 }
 
-class Friend {
+class Friend extends Equatable{
   Friend({
     required this.friend,
     required this.name,
@@ -63,4 +66,7 @@ class Friend {
         "avatar": avatar,
         "createdAt": createdAt,
       };
+
+  @override
+  List<Object?> get props => [friend, name, avatar, createdAt];
 }
