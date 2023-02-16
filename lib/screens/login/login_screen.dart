@@ -12,7 +12,11 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../signup/signup_screen.dart';
+
 class LoginScreen extends StatefulWidget {
+  final bool x ;
+  const LoginScreen({Key? key, this.x = false}) : super(key: key);
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
@@ -23,6 +27,8 @@ class _LoginScreenState extends State<LoginScreen> {
     'devtype': 1,
     'devtoken': '',
   };
+
+  bool passToggle = true;
 
   @override
   void initState() {
@@ -154,7 +160,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                   SizedBox(height: 20),
                                   TextFormField(
-                                      obscureText: true,
+                                      obscureText: passToggle,
                                       decoration: InputDecoration(
                                         contentPadding:
                                             EdgeInsets.symmetric(vertical: 11),
@@ -162,10 +168,37 @@ class _LoginScreenState extends State<LoginScreen> {
                                         isDense: true,
                                         // and add this line
                                         hintText: 'Password',
+                                        suffixIcon: InkWell(
+                                          onTap:(){
+                                            setState(() {
+                                              passToggle = !passToggle;
+                                            });
+                                          },
+                                          child: Icon(
+                                            passToggle ? Icons.visibility : Icons.visibility_off
+                                          ),
+                                        )
                                       ),
                                       validator: passwordValidator,
                                       onSaved: savePassword
                                     ),
+                                  widget.x
+                                  ? Container(child:
+                                      Row(
+                                        children: [
+                                          Icon(Icons.error,
+                                            color: Colors.red,
+                                            size: 18,),
+                                          SizedBox(width: 5,),
+                                          Text(
+                                            "Tên đăng nhập hoặc mật khẩu không chính xác",
+                                            style: TextStyle(color: Colors.red)
+                                            ),
+                                        ],
+                                      ),
+                                      alignment: Alignment.bottomCenter,
+                                      height: 25,)
+                                  : SizedBox(height:25,width: 10,),
                                   Container(
                                     margin: EdgeInsets.only(top: 50),
                                     height: 40, //height of button
@@ -197,7 +230,38 @@ class _LoginScreenState extends State<LoginScreen> {
                                           print(deviceInfo);
                                         },
                                         child: Text('Forgot password?')),
-                                  )
+                                  ),
+                                  Container(
+                                    margin: EdgeInsets.only(top: 50),
+                                    height: 40, //height of button
+                                    width: double.infinity, //width of button
+                                    child: Text(
+                                      "OR",
+                                      style: TextStyle(fontSize: 12, color: Colors.black38,),
+                                    ),
+                                    alignment: Alignment.center,
+                                  ),
+                                  Container(
+                                    height: 40, //height of button
+                                    width: 150, //width of button
+                                    child: ElevatedButton(
+                                      onPressed: () {
+                                        Navigator.of(context).push(MaterialPageRoute(
+                                          builder: (context) =>
+                                              SignupScreen(),
+                                        ));
+                                      },
+                                      child: Text('SIGN UP'),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Palette.facebookBlue,
+                                        textStyle:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                            BorderRadius.circular(30)),
+                                      ),
+                                    ),
+                                  ),
                                 ],
                               ))
                         ]),

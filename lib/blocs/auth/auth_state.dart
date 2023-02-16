@@ -2,7 +2,7 @@ import  'package:equatable/equatable.dart';
 
 import '../../models/auth_user_model.dart';
 
-enum AuthStatus { unknown, authenticated, unauthenticated }
+enum AuthStatus { unknown, authenticated, unauthenticated, loginFail }
 
 class AuthState extends Equatable {
   final AuthStatus status;

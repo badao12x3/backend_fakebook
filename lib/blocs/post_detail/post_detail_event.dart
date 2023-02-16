@@ -16,3 +16,8 @@ class PostDetailReload extends PostDetailEvent {
 
   PostDetailReload({required this.postId});
 }
+
+class PostDetailLike extends PostDetailEvent {
+  final String postId;
+  PostDetailLike({required this.postId});
+}

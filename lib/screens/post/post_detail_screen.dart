@@ -12,7 +12,10 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import '../../blocs/comment/comment_bloc.dart';
+import '../../blocs/post/post_bloc.dart';
+import '../../blocs/post/post_event.dart';
 import '../../constants/assets/placeholder.dart';
+import '../../models/post_model.dart';
 import '../../repositories/post_repository.dart';
 
 class PostDetailScreen extends StatelessWidget {
@@ -42,8 +45,18 @@ class PostDetailContent extends StatelessWidget {
     Key? key,
   }) : super(key: key);
 
+
+
+
   @override
   Widget build(BuildContext context) {
+
+    void handleLikePost(String id) {
+      // print("#PostContainer: Like post: ${post.id}");
+      // Bị vấn đề là dùng chung PostContainer và khi state của 1 trong 2 cái chưa load hết mà update thì sẽ khả năng lỗi mảng cao
+      // Đã sửa bằng cách fix if(indexOfMustUpdatePost == -1) return; ---> nhưng chỉ update được 1 trong 2 cái, 1 cái còn lại luôn báo lỗi không thấy mảng -1 dù cả 2 đã load hết state ---> Tạm chấp nhận được
+      BlocProvider.of<PostDetailBloc>(context).add(PostDetailLike(postId: id));
+    }
     return BlocBuilder<PostDetailBloc, PostDetailState>(
         builder: (context, state) {
           switch (state.postDetailStatus) {
@@ -55,10 +68,20 @@ class PostDetailContent extends StatelessWidget {
               return Center(child: Text('Failed to fetch detail post'));
             case PostDetailStatus.success: {
               final post = state.postDetail!;
+
               DateTime dt1 = DateTime.now();
               DateTime dt2 = DateTime.parse(post.updatedAt);
               final Duration diff = dt1.difference(dt2);
               final String timeAgo = diff.inDays == 0 ? "${diff.inHours}h" : "${diff.inDays}d";
+
+              // void handleLikePost() {
+              //   // print("#PostContainer: Like post: ${post.id}");
+              //   // Bị vấn đề là dùng chung PostContainer và khi state của 1 trong 2 cái chưa load hết mà update thì sẽ khả năng lỗi mảng cao
+              //   // Đã sửa bằng cách fix if(indexOfMustUpdatePost == -1) return; ---> nhưng chỉ update được 1 trong 2 cái, 1 cái còn lại luôn báo lỗi không thấy mảng -1 dù cả 2 đã load hết state ---> Tạm chấp nhận được
+              //   BlocProvider.of<PostDetailBloc>(context).add(PostDetailLike(postId: post.id));
+              //   // BlocProvider.of<PersonalPostBloc>(context).add(PersonalPostLike(post: post));
+              // }
+
               return Container(
                 padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
                 color: Colors.white,
@@ -113,7 +136,7 @@ class PostDetailContent extends StatelessWidget {
                           shares: 0,
                           isLiked: post.isLiked,
                           onLikePost: () {
-
+                            handleLikePost(post.id);
                           }
                       ),
                     ),
