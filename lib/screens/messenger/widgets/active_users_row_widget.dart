@@ -91,6 +91,7 @@ class _UserListPageState extends State<UserListPage> {
             onPressed: _selectedUsers.isEmpty
                 ? null
                 : () {
+              _selectedUsers.add(StreamChat.of(context).currentUser!);
               Navigator.of(context).push(MaterialPageRoute(
                 builder: (context) =>
                     CreateRoomPage(participants: _selectedUsers),

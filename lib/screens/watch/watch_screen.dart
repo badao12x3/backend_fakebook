@@ -229,13 +229,14 @@ class VideoContainer extends StatefulWidget {
 class _VideoContainerState extends State<VideoContainer> {
   late YoutubePlayerController _controller;
 
+  late bool isMute = true;
   @override
   void initState() {
     super.initState();
     _controller = YoutubePlayerController(
       initialVideoId: (YoutubePlayer.convertUrlToId(widget.url)!),
       flags: const YoutubePlayerFlags(
-        autoPlay: false,
+        autoPlay: true,
         mute: true,
       )
     );
@@ -249,43 +250,61 @@ class _VideoContainerState extends State<VideoContainer> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      // fit: StackFit.expand,
-      children:<Widget>[
-        Container(
-          // height: 236,
-          // width: double.infinity,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: YoutubePlayer(controller: _controller)
-          ),
-        ),
-        Align(
-          alignment: Alignment.topRight,
-          child: IconButton(
-            icon: const Icon(Icons.airplay_sharp),
-            color: Colors.white,
-            onPressed: () {},
-          ),
-        ),
-        Positioned(
-          bottom: 15,
-          right: 10,
-          child: CircleAvatar(
-            radius: 17,
-            backgroundColor: Colors.black,
-            child: IconButton(
-              icon: const Icon(
-                Icons.volume_up_outlined,
-                color: Colors.white,
-                size: 20,),
-              onPressed: () {},
-
+    return YoutubePlayerBuilder(
+        player: YoutubePlayer(
+        controller: _controller,
+      ),
+      builder: (context, player){
+        return Stack(
+          // fit: StackFit.expand,
+          children:<Widget>[
+            Container(
+              // height: 236,
+              // width: double.infinity,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: player
+              ),
             ),
-          ),
-        )
-      ],
-    );
+            // player,
+            Align(
+              alignment: Alignment.topRight,
+              child: IconButton(
+                icon: const Icon(Icons.airplay_sharp),
+                color: Colors.white,
+                onPressed: () {},
+              ),
+            ),
+            Positioned(
+              bottom: 15,
+              right: 10,
+              child:
+              // Icon( Icons.volume_up_rounded),
+              CircleAvatar(
+                radius: 17,
+                backgroundColor: Colors.black,
+                child: IconButton(
+                  icon: Icon(
+                    isMute
+                      ? Icons.volume_off_rounded
+                      : Icons.volume_up_rounded,
+                    color: Colors.white,
+                    size: 20,),
+                  onPressed: () {
+                    setState(() {
+                      isMute = !isMute;
+                      if(isMute) _controller.setVolume(0);
+                      else _controller.setVolume(100);
+                    });
+
+                  },
+
+                ),
+              ),
+            )
+          ],
+        );
+        });
   }
 }
 

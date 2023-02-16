@@ -7,8 +7,10 @@ import 'package:fakebook_frontend/blocs/friend/friend_bloc.dart';
 import 'package:fakebook_frontend/blocs/personal_post/personal_post_bloc.dart';
 import 'package:fakebook_frontend/blocs/list_video/list_video_bloc.dart';
 import 'package:fakebook_frontend/blocs/post_detail/post_detail_bloc.dart';
+import 'package:fakebook_frontend/blocs/signup/signup_bloc.dart';
 import 'package:fakebook_frontend/repositories/post_repository.dart';
 import 'package:fakebook_frontend/repositories/request_received_friend_repository.dart';
+import 'package:fakebook_frontend/repositories/signup_repository.dart';
 
 import 'package:fakebook_frontend/repositories/video_repository.dart';
 import 'package:fakebook_frontend/routes.dart';
@@ -31,6 +33,8 @@ import './screens/screens.dart';
 import 'blocs/personal_info/personal_info_bloc.dart';
 import 'blocs/post/post_bloc.dart';
 import 'blocs/request_received_friend/request_received_friend_bloc.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 
 void main() async{
@@ -38,6 +42,10 @@ void main() async{
     '6za27trdby7z',
     logLevel: Level.OFF,
   );
+
+  // await Firebase.initializeApp(
+  //   options: DefaultFirebaseOptions.currentPlatform,
+  // );
   // debug global BLOC, suggesting turn off, please override in debug local BLOC
   Bloc.observer = SimpleBlocObserver();
   runApp(MyApp(client: client));
@@ -52,6 +60,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     PostRepository postRepository = PostRepository();
     VideoRepository videoRepository = VideoRepository();
+    SignupRepository signupRepository = SignupRepository();
     FriendRequestReceivedRepository friendRequestReceivedRepository = FriendRequestReceivedRepository();
     return MultiBlocProvider(
       providers: [
@@ -90,7 +99,11 @@ class MyApp extends StatelessWidget {
         BlocProvider<FriendBloc>(
           lazy: false,
           create: (_) => FriendBloc(),
-        )
+        ),
+        BlocProvider<SignupBloc>(
+          lazy: false,
+          create: (_) => SignupBloc(signupRepository: signupRepository),
+        ),
       ],
       child: MaterialApp(
         title: 'Fakebook',
@@ -110,6 +123,8 @@ class MyApp extends StatelessWidget {
                   return LoginScreen();
                 case AuthStatus.unauthenticated:
                   return LoginScreen();
+                case AuthStatus.loginFail:
+                  return LoginScreen(x: true);
                 case AuthStatus.authenticated:
                   return NavScreen();
               }
@@ -140,9 +155,9 @@ class MyApp extends StatelessWidget {
                 final String? accountId = settings.arguments as String?;
                 return MaterialPageRoute(builder: (_) => PersonalScreen(accountId: accountId));
               }
-              case Routes.messenger_screen: {
-                return MaterialPageRoute(builder: (_) => MessengerScreen());
-              }
+              // case Routes.messenger_screen: {
+              //   return MaterialPageRoute(builder: (_) => MessengerScreen());
+              // }
               default:
                 return MaterialPageRoute(builder: (_) => NavScreen());
             }

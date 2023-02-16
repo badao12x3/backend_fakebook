@@ -47,7 +47,7 @@ class AuthUser extends Equatable{
       id: authUserData["id"] as String,
       name: authUserData["name"] as String,
       token: authUserData["token"] as String,
-      avatar: authUserData["avatar"] as String,
+      avatar: authUserData["avatar"] ?? "https://kansai-resilience-forum.jp/wp-content/uploads/2019/02/IAFOR-Blank-Avatar-Image-1.jpg" as String,
       active: authUserData["active"] as bool,
     );
   }

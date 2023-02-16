@@ -1,3 +1,4 @@
+import 'package:fakebook_frontend/screens/messenger/page/people_page.dart';
 import 'package:fakebook_frontend/screens/messenger/widgets/active_users_row_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -22,9 +23,9 @@ class MessengerScreen extends StatefulWidget {
 class _MessengerScreenState extends State<MessengerScreen> {
   late final Future<OwnUser> connectionFuture;
   late final client = StreamChat.of(context).client;
-  late final name ;
 
   late final user = BlocProvider.of<AuthBloc>(context).state.authUser;
+  int tabIndex = 0;
   // final token = user.token;
   // String userId ;
   // print("$token, $userId");
@@ -42,7 +43,7 @@ class _MessengerScreenState extends State<MessengerScreen> {
 
   @override
   void dispose() {
-    print(ModalRoute.of(context)?.settings.name);
+    // print(ModalRoute.of(context)?.settings.name);
     client.disconnectUser();
     super.dispose();
   }
@@ -52,22 +53,46 @@ class _MessengerScreenState extends State<MessengerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: FutureBuilder(
-        future: connectionFuture,
-        builder: (BuildContext context, AsyncSnapshot snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.waiting:
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            default:
-              if (snapshot.hasError) {
-                return Text('Error: ${snapshot.error}');
-              } else {
-                return const ChannelListPage();
+      appBar: AppBar(title: Text("Messenger"),
+      centerTitle: true,),
+      body: IndexedStack(
+        index: tabIndex,
+        children: [
+          FutureBuilder(
+            future: connectionFuture,
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
+              switch (snapshot.connectionState) {
+                case ConnectionState.waiting:
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                default:
+                  if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  } else {
+                    return const ChannelListPage();
+                  }
               }
-          }
-        },
+            },
+          ),
+          Scaffold(body: PeoplePage(),)
+        ],
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: tabIndex,
+        selectedItemColor: Colors.black,
+        unselectedItemColor: Colors.black38,
+        onTap: (index) => setState(() => tabIndex = index),
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.chat),
+            label: 'Chats',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.people),
+            label: 'People',
+          ),
+        ],
       ),
     );
   }
@@ -166,7 +191,7 @@ class ChannelPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: const StreamChannelHeader(),
+      appBar: const StreamChannelHeader(),
       body: Column(
         children: const <Widget>[
           Expanded(

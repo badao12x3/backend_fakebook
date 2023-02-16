@@ -1,6 +1,9 @@
 import 'dart:io';
 
 import 'package:fakebook_frontend/models/user_chat_model.dart';
+import 'package:fakebook_frontend/screens/messenger/api/firebase_google_api.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
@@ -43,12 +46,14 @@ class _CreateRoomPageState extends State<CreateRoomPage> {
                 .map((participant) => participant.id)
                 .toList();
 
+            final idChanel = Uuid().v4();
+            // final urlImage = await FirebaseGoogleApi.uploadImage("image/$idChanel", imageFile);
             final channel = await  StreamChat.of(context).client.channel(
               "messaging",
-              id: "travel",
+              id: idChanel,
               extraData: {
                 "name": name,
-                "image": "http://bit.ly/2O35mws",
+                "image": "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.freepik.com%2Fpremium-vector%2Fgroup-people-holding-blank-sign-banner-character-flat-cartoon-illustration-vector-design_20075961.htm&psig=AOvVaw2GgSVs9jxDl53waVyEsWTu&ust=1676584986696000&source=images&cd=vfe&ved=0CBAQjRxqFwoTCNDY2vfDmP0CFQAAAAAdAAAAABAE",
                 "members": idParticipants,
               },
             );
@@ -72,6 +77,13 @@ class _CreateRoomPageState extends State<CreateRoomPage> {
         GestureDetector(
           onTap: 
               () async {
+            // var picked = await FilePicker.platform.pickFiles();
+            //
+            // if (picked != null) {
+            //   print(picked.files.first.name);
+            //
+            // }else return;
+
             final pickedFile =
             await ImagePicker().getImage(source: ImageSource.gallery);
 
@@ -79,6 +91,8 @@ class _CreateRoomPageState extends State<CreateRoomPage> {
 
             setState(() {
               imageFile = File(pickedFile.path);
+
+              // imageFile = File(picked.files.first.path!);
             });
           },
           child: buildImage(context),
@@ -130,7 +144,7 @@ class _CreateRoomPageState extends State<CreateRoomPage> {
     children: widget.participants
         .map((member) => ListTile(
       contentPadding: EdgeInsets.zero,
-      leading: ProfileImageWidget(imageUrl: member.image ?? "https://images.unsplash.com/photo-1580907114587-148483e7bd5f?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80"),
+      leading: ProfileImageWidget(imageUrl: member.image ?? "https://www.google.com/url?sa=i&url=https%3A%2F%2Fpixabay.com%2Fvectors%2Fblank-profile-picture-mystery-man-973460%2F&psig=AOvVaw35UMz_aHbEjd-jPZW4Lx99&ust=1676570463404000&source=images&cd=vfe&ved=0CA0QjRxqFwoTCLiVjOuNmP0CFQAAAAAdAAAAABAD"),
       title: Text(
         member.name,
         style: TextStyle(fontWeight: FontWeight.bold),

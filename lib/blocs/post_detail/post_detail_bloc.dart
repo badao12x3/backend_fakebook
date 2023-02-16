@@ -3,10 +3,14 @@ import 'package:fakebook_frontend/blocs/post_detail/post_detail_state.dart';
 import 'package:fakebook_frontend/repositories/repositories.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../models/post_detail_model.dart';
+
 class PostDetailBloc extends Bloc<PostDetailEvent, PostDetailState> {
   late final PostRepository postRepository;
   PostDetailBloc({required this.postRepository}): super(PostDetailState.initial()) {
     on<PostDetailFetched>(_onPostDetailFetched);
+
+    on<PostDetailLike>(_onPostDetailLike);
   }
 
   Future<void> _onPostDetailFetched(PostDetailFetched event, Emitter<PostDetailState> emit) async {
@@ -23,6 +27,41 @@ class PostDetailBloc extends Bloc<PostDetailEvent, PostDetailState> {
     }
   }
 
+  Future<void> _onPostDetailLike(PostDetailLike event, Emitter<PostDetailState> emit) async {
+    final postId = event.postId ;
+
+    final mustUpdatePost = state.postDetail as PostDetail;
+    int likes = mustUpdatePost.isLiked ? mustUpdatePost.likes - 1 : mustUpdatePost.likes + 1;
+    final newUpdatedPost = mustUpdatePost.copyWith(likes: likes, isLiked: !mustUpdatePost.isLiked);
+
+    emit(state.copyWith(postDetail: newUpdatedPost));
+
+    try {
+      if (!mustUpdatePost.isLiked){
+        final likePost = await postRepository.likeHomePost(id: postId);
+        if (likePost.code == '506') {
+          // TC1: tài khoản của mình đột nhiên bị khóa, cần chuyển tới màn login ---> Không làm được, do không gọi tới AuthBloc mà update state
+          // TC2: Nếu mình block nó/nó block mình thì không like được
+        } else if (likePost.code == '9991') {
+          // nếu like phải bài viết bị banned, lúc này mình chưa ấn reload ứng dụng nên chưa get lại API lọc posts nên sẽ xóa bài viết khỏi UI
+
+        }
+      }
+      if(mustUpdatePost.isLiked) {
+        final unlikePost = await postRepository.unlikeHomePost(id: postId);
+        if (unlikePost.code == '507') {
+          // TC1: tài khoản của mình đột nhiên bị khóa, cần chuyển tới màn login ---> Không làm được, do không gọi tới AuthBloc mà update state
+          // TC2: Nếu mình block nó/nó block mình thì vẫn unlike được ----> không tồn tại TC2
+        } else if (unlikePost.code == '9991') {
+          // nếu unlike phải bài viết bị banned, lúc này mình chưa ấn reload ứng dụng nên chưa get lại API lọc posts nên sẽ xóa bài viết khỏi UI
+
+        }
+      }
+
+    } catch(error) {
+
+    }
+  }
   @override
   void onError(Object error, StackTrace stackTrace) {
     super.onError(error, stackTrace);

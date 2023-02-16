@@ -38,9 +38,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         await prefs.setString('user', jsonEncode(user));
       }
       if(authUser.code == '9995') {
-        emit(AuthState(status: AuthStatus.unauthenticated, authUser: authUser));
+        emit(AuthState(status: AuthStatus.loginFail, authUser: authUser));
       }
-    } catch(_) {
+    } catch(error) {
+      print('#Catch login OBSERVER: $error');
       emit(state.copyWith(status: AuthStatus.unknown, authUser: AuthUser.initial()));
     }
   }
@@ -82,7 +83,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   @override
   void onEvent(AuthEvent event) {
     super.onEvent(event);
-    print('#AUTH OBSERVER: $event');
+    print('#AUTH Event: $event, $state');
   }
 
   @override
