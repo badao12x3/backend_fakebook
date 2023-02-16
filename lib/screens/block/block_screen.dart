@@ -73,6 +73,10 @@ class BlockList extends StatefulWidget {
 }
 
 class _BlockListState extends State<BlockList> {
+  void handleRemoveBlock({required id}) {
+    BlocProvider.of<BlockedAccountsBloc>(context).add(RemoveBlockById(id: id));
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<BlockedAccountsBloc, BlockedAccountsState>(
@@ -84,7 +88,7 @@ class _BlockListState extends State<BlockList> {
         case BlockedAccountsStatus.loading:
           return Center(child: CircularProgressIndicator());
         case BlockedAccountsStatus.failure:
-          return Center(child: Text('Failed to fetch posts'));
+          return Center(child: Text('Failed to fetch blocked account'));
         case BlockedAccountsStatus.success:
           return Expanded(
             child: Padding(
@@ -94,31 +98,47 @@ class _BlockListState extends State<BlockList> {
                   itemBuilder: (context, index) {
                     final item = state.blockedAccounts?[index];
                     final time = DateTime.parse(item?.createdAt as String);
-                    return Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        ProfileAvatar(
-                            imageUrl: item?.userHeader.avatar as String),
-                        const SizedBox(width: 12.0),
-                        Expanded(
-                            child: Column(
-                          mainAxisSize: MainAxisSize.max,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Text(item?.userHeader.name as String,
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 18.0,
-                                    color: Colors.black)),
-                            SizedBox(height: 5),
-                            Text(
-                              'Blocked at ${time.hour.toString()}:${time.minute.toString()} ngày ${time.day}/${time.month}/${time.year}',
-                              style: TextStyle(color: Palette.grey2),
-                            ),
-                          ],
-                        )),
-                      ],
+                    return Padding(
+                      padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          ProfileAvatar(
+                              imageUrl: item?.userHeader.avatar as String),
+                          const SizedBox(width: 12.0),
+                          Expanded(
+                              child: Column(
+                            mainAxisSize: MainAxisSize.max,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Text(item?.userHeader.name as String,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18.0,
+                                      color: Colors.black)),
+                              SizedBox(height: 5),
+                              Text(
+                                'Blocked at ${time.hour.toString()}:${time.minute.toString()} ngày ${time.day}/${time.month}/${time.year}',
+                                style: TextStyle(color: Palette.grey2),
+                              ),
+                            ],
+                          )),
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(0, 5, 0, 0),
+                            child: TextButton(
+                                style: TextButton.styleFrom(
+                                  foregroundColor: Palette.facebookBlue,
+                                  textStyle: const TextStyle(
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                onPressed: () {
+                                  handleRemoveBlock(id: item?.userHeader.id);
+                                },
+                                child: Text('Bỏ chặn')),
+                          )
+                        ],
+                      ),
                     );
                   }),
             ),

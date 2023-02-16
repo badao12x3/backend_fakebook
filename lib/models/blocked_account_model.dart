@@ -2,6 +2,7 @@
 //
 //     final userHeader = userHeaderFromJson(jsonString);
 
+import 'package:equatable/equatable.dart';
 import 'package:fakebook_frontend/models/user_header_model.dart';
 import 'package:meta/meta.dart';
 import 'dart:convert';
@@ -13,7 +14,7 @@ List<BlockedAccount> blockedAccountsFromJson(String str) =>
 String blockedAccountsToJson(List<BlockedAccount> data) =>
     json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
-class BlockedAccount {
+class BlockedAccount extends Equatable {
   BlockedAccount({
     required this.userHeader,
     required this.createdAt,
@@ -37,4 +38,8 @@ class BlockedAccount {
 
   Map<String, dynamic> toJson() =>
       {"user": userHeader.toJson(), "createdAt": createdAt};
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [userHeader];
 }

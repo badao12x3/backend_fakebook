@@ -11,6 +11,8 @@ class BlockedAccountsBloc
   BlockedAccountsBloc({required this.blockRepository})
       : super(BlockedAccountsState.initial()) {
     on<BlockedAccountsFetched>(_onBlockedAccountsFetched);
+    on<BlockById>(_onBlockById);
+    on<RemoveBlockById>(_onRemoveBlockById);
   }
 
   Future<void> _onBlockedAccountsFetched(
@@ -21,6 +23,48 @@ class BlockedAccountsBloc
       final List<BlockedAccount>? blockedAccounts =
           await blockRepository.fetchBlock();
       if (blockedAccounts != null) {
+        emit(BlockedAccountsState(
+            blockedAccountsStatus: BlockedAccountsStatus.success,
+            blockedAccounts: blockedAccounts));
+      }
+    } catch (error) {
+      emit(BlockedAccountsState(
+          blockedAccountsStatus: BlockedAccountsStatus.failure,
+          blockedAccounts: null));
+    }
+  }
+
+  Future<void> _onBlockById(
+      BlockById event, Emitter<BlockedAccountsState> emit) async {
+    try {
+      emit(BlockedAccountsState(
+          blockedAccountsStatus: BlockedAccountsStatus.loading));
+      print("iddd" + event.id);
+      final isSuccess = await blockRepository.blockById(id: event.id);
+      if (isSuccess) {
+        print("dumadcroi");
+        final List<BlockedAccount>? blockedAccounts =
+            await blockRepository.fetchBlock();
+        emit(BlockedAccountsState(
+            blockedAccountsStatus: BlockedAccountsStatus.success,
+            blockedAccounts: blockedAccounts));
+      }
+    } catch (error) {
+      emit(BlockedAccountsState(
+          blockedAccountsStatus: BlockedAccountsStatus.failure,
+          blockedAccounts: null));
+    }
+  }
+
+  Future<void> _onRemoveBlockById(
+      RemoveBlockById event, Emitter<BlockedAccountsState> emit) async {
+    try {
+      emit(BlockedAccountsState(
+          blockedAccountsStatus: BlockedAccountsStatus.loading));
+      final isSuccess = await blockRepository.removeBlockById(id: event.id);
+      if (isSuccess) {
+        final List<BlockedAccount>? blockedAccounts =
+            await blockRepository.fetchBlock();
         emit(BlockedAccountsState(
             blockedAccountsStatus: BlockedAccountsStatus.success,
             blockedAccounts: blockedAccounts));

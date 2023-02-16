@@ -8,4 +8,14 @@ abstract class BlockedAccountsEvent extends Equatable {
 
 class BlockedAccountsFetched extends BlockedAccountsEvent {}
 
+class BlockById extends BlockedAccountsEvent {
+  final String id;
+  BlockById({required this.id});
+}
+
+class RemoveBlockById extends BlockedAccountsEvent {
+  final String id;
+  RemoveBlockById({required this.id});
+}
+
 class BlockedAccountsReload extends BlockedAccountsEvent {}

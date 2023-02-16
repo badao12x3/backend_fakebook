@@ -36,4 +36,49 @@ class BlockRepository {
       return null;
     }
   }
+
+  Future<dynamic> blockById({required String id}) async {
+    try {
+      var token = await Token.getToken();
+      final url = Uri.http(Configuration.baseUrlConnect, 'account/block_by_id');
+      final response = await http.post(url,
+          headers: <String, String>{
+            HttpHeaders.authorizationHeader: token,
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          body: jsonEncode(<String, dynamic>{'id': id}));
+      final body = json.decode(response.body) as Map<String, dynamic>;
+      if (response.statusCode == 200) {
+        return true;
+      } else if (response.statusCode == 400) {
+        return false;
+      }
+    } catch (error) {
+      throw Exception('${error} - Error to like post');
+    }
+    return false;
+  }
+
+  Future<dynamic> removeBlockById({required String id}) async {
+    try {
+      var token = await Token.getToken();
+      final url =
+          Uri.http(Configuration.baseUrlConnect, 'account/remove_block_by_id');
+      final response = await http.post(url,
+          headers: <String, String>{
+            HttpHeaders.authorizationHeader: token,
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          body: jsonEncode(<String, dynamic>{'id': id}));
+      final body = json.decode(response.body) as Map<String, dynamic>;
+      if (response.statusCode == 200) {
+        return true;
+      } else if (response.statusCode == 400) {
+        return false;
+      }
+    } catch (error) {
+      throw Exception('${error} - Error to like post');
+    }
+    return false;
+  }
 }

@@ -1,7 +1,11 @@
+import 'package:fakebook_frontend/blocs/block/block_bloc.dart';
+import 'package:fakebook_frontend/blocs/block/block_event.dart';
+import 'package:fakebook_frontend/blocs/block/block_state.dart';
 import 'package:fakebook_frontend/blocs/friend/friend_bloc.dart';
 import 'package:fakebook_frontend/blocs/personal_info/personal_info_state.dart';
 import 'package:fakebook_frontend/blocs/personal_post/personal_post_bloc.dart';
 import 'package:fakebook_frontend/blocs/personal_post/personal_post_event.dart';
+import 'package:fakebook_frontend/models/blocked_account_model.dart';
 import 'package:fakebook_frontend/models/post_model.dart';
 import 'package:fakebook_frontend/screens/personal/widgets/friend.dart';
 import 'package:flutter/material.dart';
@@ -41,16 +45,18 @@ class _PersonalScreenState extends State<PersonalScreen> {
   late final String? accountId;
   late final String userId; // dùng chung cho cả mình và người khác
   late final bool isMe;
-
   @override
   void initState() {
     super.initState();
+    BlocProvider.of<BlockedAccountsBloc>(context).add(BlockedAccountsFetched());
     _scrollController.addListener(_onScroll);
 
     authUser = BlocProvider.of<AuthBloc>(context).state.authUser;
     accountId = widget.accountId;
+
     userId = accountId ?? authUser.id;
-    isMe = accountId != null ? false : true;
+    isMe =
+        (accountId != null) ? (accountId != authUser.id ? false : true) : true;
   }
 
   @override
@@ -75,6 +81,17 @@ class _PersonalScreenState extends State<PersonalScreen> {
           .read<PersonalPostBloc>()
           .add(PersonalPostFetched(accountId: userId));
     }
+  }
+
+  void handleBlock() {
+    // print("#PostContainer: Like post: ${post.id}");
+    // Bị vấn đề là dùng chung PostContainer và khi state của 1 trong 2 cái chưa load hết mà update thì sẽ khả năng lỗi mảng cao
+    // Đã sửa bằng cách fix if(indexOfMustUpdatePost == -1) return; ---> nhưng chỉ update được 1 trong 2 cái, 1 cái còn lại luôn báo lỗi không thấy mảng -1 dù cả 2 đã load hết state ---> Tạm chấp nhận được
+    BlocProvider.of<BlockedAccountsBloc>(context).add(BlockById(id: userId));
+  }
+
+  void handleRemoveBlock({required id}) {
+    BlocProvider.of<BlockedAccountsBloc>(context).add(RemoveBlockById(id: id));
   }
 
   @override
@@ -151,28 +168,67 @@ class _PersonalScreenState extends State<PersonalScreen> {
                   children: [
                     UserName(),
                     const SizedBox(height: 15.0),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => ProfileSetScreen()));
-                      },
-                      child: ClipRRect(
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(10.0)),
-                        child: Container(
-                            alignment: Alignment.center,
-                            width: double.infinity,
-                            height: 45.0,
-                            color: Colors.grey[300],
-                            child: const Text(
-                              "Cài đặt trang cá nhân",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 18.0),
-                            )),
+                    if (isMe)
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => ProfileSetScreen()));
+                        },
+                        child: ClipRRect(
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(10.0)),
+                          child: Container(
+                              alignment: Alignment.center,
+                              width: double.infinity,
+                              height: 45.0,
+                              color: Colors.grey[300],
+                              child: const Text(
+                                "Cài đặt trang cá nhân",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18.0),
+                              )),
+                        ),
                       ),
-                    ),
+                    if (!isMe)
+                      Row(children: [
+                        Expanded(
+                          child: Padding(
+                            padding: EdgeInsets.only(right: 5),
+                            child: ElevatedButton(
+                              onPressed: () {},
+                              child: Text('Kết bạn'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Palette.facebookBlue,
+                                textStyle:
+                                    TextStyle(fontWeight: FontWeight.bold),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8)),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Padding(
+                              padding: EdgeInsets.only(left: 5),
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  handleBlock();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Palette.grey2,
+                                  textStyle: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8)),
+                                ),
+                                child: Text('Block'),
+                              )),
+                        ),
+                      ]),
                     const SizedBox(height: 5.0),
                     const Divider(height: 10.0, thickness: 2),
                     const SizedBox(height: 10.0),
@@ -211,18 +267,18 @@ class _PersonalScreenState extends State<PersonalScreen> {
                 ),
               ),
             ),
-            if(isMe) SliverToBoxAdapter(
-              child: Container(
-                color: Colors.white,
-                padding: EdgeInsets.symmetric(horizontal: 13),
-                child: Text(
-                  "Bài viết của bạn", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
-                )
+            if (isMe)
+              SliverToBoxAdapter(
+                child: Container(
+                    color: Colors.white,
+                    padding: EdgeInsets.fromLTRB(13, 5, 13, 5),
+                    child: Text(
+                      "Bài viết của bạn",
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+                    )),
               ),
-            ),
-            if(isMe) SliverToBoxAdapter(
-                child: CreatePostContainer()
-            ),
+            if (isMe) SliverToBoxAdapter(child: CreatePostContainer()),
             PersonalPostList()
           ],
           controller: _scrollController,
