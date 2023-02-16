@@ -1,6 +1,5 @@
 import 'package:fakebook_frontend/blocs/search/search_event.dart';
 import 'package:fakebook_frontend/blocs/search/search_state.dart';
-import 'package:fakebook_frontend/models/search_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../repositories/search_repository.dart';
@@ -28,19 +27,17 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
   }
 
   Future<void> _onSearch(Search event, Emitter<SearchState> emit) async {
-    final keyword = event.keyword;
+    String keyword = event.keyword;
     try {
+      print("postListData?.posts.length");
       final postListData = await searchRepository.searchSth(keyword: keyword);
-      // lọc tất cả các bài viết bị banned
-      final mustFilteredPosts = postListData;
-      mustFilteredPosts?.retainWhere(
-          (post) => post.banned == false && post.isBlocked == false);
-      // print('Length: ${postList.posts.length}');
-      emit(state.copyWith(searchStatus: SearchStatus.loading));
-      return emit(
+      print(postListData?.posts.length);
+
+      state.postList = postListData?.posts;
+      emit(
         SearchState(
           searchStatus: SearchStatus.success,
-          postList: mustFilteredPosts,
+          postList: state.postList,
         ),
       );
     } catch (_) {

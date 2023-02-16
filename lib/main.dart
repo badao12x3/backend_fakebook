@@ -1,23 +1,16 @@
-import 'dart:convert';
-import 'dart:io';
-
-import 'package:bloc/bloc.dart';
 import 'package:fakebook_frontend/blocs/comment/comment_bloc.dart';
 import 'package:fakebook_frontend/blocs/friend/friend_bloc.dart';
 import 'package:fakebook_frontend/blocs/personal_post/personal_post_bloc.dart';
 import 'package:fakebook_frontend/blocs/list_video/list_video_bloc.dart';
 import 'package:fakebook_frontend/blocs/post_detail/post_detail_bloc.dart';
 import 'package:fakebook_frontend/repositories/post_repository.dart';
-import 'package:fakebook_frontend/repositories/request_received_friend_repository.dart';
 
 import 'package:fakebook_frontend/repositories/video_repository.dart';
 import 'package:fakebook_frontend/routes.dart';
 import 'package:fakebook_frontend/blocs/auth/auth_bloc.dart';
 import 'package:fakebook_frontend/blocs/auth/auth_event.dart';
 import 'package:fakebook_frontend/blocs/auth/auth_state.dart';
-import 'package:fakebook_frontend/configuration.dart';
 import 'package:fakebook_frontend/screens/personal/personal_screen.dart';
-import 'package:fakebook_frontend/screens/post/emotion_screen.dart';
 import 'package:fakebook_frontend/screens/request_received_friend/sub_screens/list_friend_screen.dart';
 import 'package:fakebook_frontend/screens/request_received_friend/sub_screens/unknown_people_screen.dart';
 import 'package:fakebook_frontend/simple_bloc_observer.dart';
@@ -25,12 +18,11 @@ import 'package:flutter/material.dart';
 
 import 'package:fakebook_frontend/constants/assets/palette.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import './screens/screens.dart';
 import 'blocs/personal_info/personal_info_bloc.dart';
 import 'blocs/post/post_bloc.dart';
 import 'blocs/request_received_friend/request_received_friend_bloc.dart';
+import 'blocs/search/search_bloc.dart';
 import 'blocs/unknow_people/unknow_people_bloc.dart';
 
 
@@ -48,7 +40,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     PostRepository postRepository = PostRepository();
     VideoRepository videoRepository = VideoRepository();
-    FriendRequestReceivedRepository friendRequestReceivedRepository = FriendRequestReceivedRepository();
     return MultiBlocProvider(
       providers: [
         BlocProvider<AuthBloc>(
@@ -90,6 +81,10 @@ class MyApp extends StatelessWidget {
         BlocProvider<ListUnknownPeopleBloc>(
           lazy: false,
           create: (_) => ListUnknownPeopleBloc(),
+        ),
+        BlocProvider<SearchBloc>(
+          lazy: false,
+          create: (_) => SearchBloc(),
         )
       ],
       child: MaterialApp(

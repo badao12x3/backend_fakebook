@@ -32,7 +32,7 @@ class SearchRepository {
     }
   }
 
-  Future<List<Post>?> searchSth({required String keyword}) async {
+  Future<PostList?> searchSth({required String keyword}) async {
     try {
       final url = Uri.http(Configuration.baseUrlConnect, '/search/search_sth');
 
@@ -46,8 +46,8 @@ class SearchRepository {
 
       if (response.statusCode == 200) {
         final body = json.decode(response.body) as Map<String, dynamic>;
-        final postsData = body["data"]["posts"] as List<dynamic>?;
-        List<Post>? posts = postsData?.map((post) => Post.fromJson(post)).toList();
+        final postList = PostList.fromJson(body);
+        return postList;
       } else if (response.statusCode == 400) {
         return null;
       } else {

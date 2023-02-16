@@ -1,14 +1,13 @@
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:fakebook_frontend/blocs/search/search_bloc.dart';
-import 'package:fakebook_frontend/blocs/search/search_event.dart';
-import 'package:fakebook_frontend/constants/localdata/local_data.dart';
-import 'package:fakebook_frontend/models/search_model.dart';
 import 'package:flutter/material.dart';
 
-import 'package:fakebook_frontend/screens/personal/widgets/personal_widgets.dart';
-import 'package:fakebook_frontend/constants/assets/palette.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
+
+import '../../../blocs/search/search_bloc.dart';
+import '../../../blocs/search/search_event.dart';
+import '../../../blocs/search/search_state.dart';
+import '../../../common/widgets/bottom_loader.dart';
+import '../../home/widgets/post_container.dart';
 
 class SearchProfileScreen extends StatefulWidget {
   @override
@@ -127,7 +126,8 @@ class _SearchProfileScreenState extends State<SearchProfileScreen> {
             addSearchTerm(query);
             selectedTerm = query;
           });
-          controller.close();
+          context.read<SearchBloc>().add(Search(keyword: query));
+
         },
         builder: (context, transition) {
           return ClipRRect(
@@ -182,13 +182,13 @@ class _SearchProfileScreenState extends State<SearchProfileScreen> {
                                       });
                                     },
                                   ),
-                          onTap: () {
+                                  onTap: () {
                                     setState(() {
                                       putSearchTermFirst(term);
                                       selectedTerm = term;
                                     });
                                     controller.close();
-                          },
+                                  },
                                 ))
                             .toList(),
                       );
@@ -210,45 +210,37 @@ class SearchResultListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Container(
+      padding: EdgeInsets.fromLTRB(0, 80, 0, 0),
+      child: CustomScrollView(slivers: [PostSearchList()]),
+    );
   }
 }
 
-// class PostList extends StatefulWidget {
-//   const PostList({
-//     Key? key,
-//   }) : super(key: key);
-//
-//   @override
-//   State<PostList> createState() => _PostListState();
-// }
-//
-// class _PostListState extends State<PostList> {
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return BlocBuilder<PostBloc, PostState>(
-//         builder: (context, state) {
-//           // switch case hết giá trị thì BlocBuilder sẽ tự hiểu không bao giờ rơi vào trường hợp null ---> Siêu ghê
-//           switch (state.status) {
-//             case PostStatus.initial:
-//               return const SliverToBoxAdapter(child: Center(child: CircularProgressIndicator()));
-//             case PostStatus.loading:
-//               return const SliverToBoxAdapter(child: Center(child: CircularProgressIndicator()));
-//             case PostStatus.failure:
-//               return const SliverToBoxAdapter(child: Center(child: Text('Failed to fetch posts')));
-//             case PostStatus.success:
-//               return SliverList(
-//                   delegate: SliverChildBuilderDelegate((context, index) {
-//                     return index >= state.postList.posts.length
-//                         ? const BottomLoader()
-//                         : PostContainer(post: state.postList.posts[index] as Post);
-//                   },
-//                       childCount: state.postList.posts.length)
-//               );
-//           // return const Center(child: Text('Successed to fetch posts'));
-//           }
-//         }
-//     );
-//   }
-// }
+class PostSearchList extends StatefulWidget {
+  const PostSearchList({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  State<PostSearchList> createState() => _PostSearchListState();
+}
+
+class _PostSearchListState extends State<PostSearchList> {
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<SearchBloc, SearchState>(builder: (context, state) {
+      if (state.postList?.length != null) {
+        final size = state.postList?.length;
+        return SliverList(
+            delegate: SliverChildBuilderDelegate((context, index) {
+          return index >= size!
+              ? const BottomLoader()
+              : PostContainer(post: state.postList![index]);
+        }, childCount: size));
+      } else {
+        return Text("Không có gì cả");
+      }
+    });
+  }
+}
